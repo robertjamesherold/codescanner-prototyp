@@ -20,7 +20,7 @@ const Bereinigen = () => {
       topbar={<Layout.Topbar variant="bereinigen" />}
       bottombar={<Layout.Bottombar variant="bereinigen" />}
     >
-      <div className="mx-auto max-w-300 space-y-5  py-6">
+      <div className="mx-auto max-w-300 px-4  space-y-5  py-6">
         {/* Tab-Leiste */}
         <div className="flex gap-3 border-b border-border-1">
           {TABS.map((t) => {

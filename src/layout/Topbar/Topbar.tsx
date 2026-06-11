@@ -144,7 +144,7 @@ const Topbar = ({
   if (variant === "recent") {
     return (
       <header data-layer="Topbar" className={wrapper}>
-        <div className="mx-auto flex max-w-300  flex-col gap-4">
+        <div className="mx-auto flex max-w-300 px-4  flex-col gap-4">
           {/* Reserviert die Höhe der fehlenden obersten Reihe (Back-Link/Projekt),
               damit die recent-Topbar genauso hoch ist wie die anderen Varianten. */}
           <div aria-hidden className="h-10" />
@@ -227,7 +227,7 @@ const Topbar = ({
 
   return (
     <header data-layer="Topbar" className={wrapper}>
-      <div className="mx-auto flex max-w-300  flex-col gap-4">
+      <div className="mx-auto flex max-w-300  px-4 flex-col gap-4">
         {/* Zeile 1: Back-Link + Projekt */}
         <div className="flex items-center justify-between">
           <Link to={backTo} label={backLabel} rightIcon={null} onClick={onBack} />

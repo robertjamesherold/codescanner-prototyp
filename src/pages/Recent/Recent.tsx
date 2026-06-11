@@ -13,7 +13,7 @@ const PROJECTS = [
 /** Seite "Zuletzt" (/recent) — recent-Topbar + Projekt-Grid. */
 const Recent = () => (
   <Layout.Content topbar={<Layout.Topbar variant="recent" />}>
-    <div className="mx-auto grid max-w-300 grid-cols-3 gap-5 py-12">
+    <div className="mx-auto grid max-w-300 px-4  grid-cols-3 gap-5 py-12">
       {PROJECTS.map((p) => (
         <components.ProjectCard key={p.title} {...p} />
       ))}

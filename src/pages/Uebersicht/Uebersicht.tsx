@@ -7,7 +7,7 @@ const Uebersicht = () => (
     topbar={<Layout.Topbar variant="uebersicht" />}
     bottombar={<Layout.Bottombar variant="uebersicht" />}
   >
-    <div className="mx-auto grid max-w-300 grid-cols-6 gap-5 py-12">
+    <div className="mx-auto grid max-w-300 px-4  grid-cols-6 gap-5 py-12">
       {/* Reihe 1 */}
       <div className="col-span-4">
         <components.RecommendedStepCard />
