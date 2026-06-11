@@ -75,10 +75,10 @@ const CweCard = ({
             </span>
           </div>
 
-          <div className="flex h-4 items-center gap-3">
+          <div className="flex h-4 items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Icon name="AlertTriangle" size={14} strokeWidth={2} className="text-text-1" />
-              <span className="text-sm text-text-1">{description}</span>
+              <span className="text-sm text-text-1 truncate w-36">{description}</span>
             </div>
             <span aria-hidden className="h-full w-px bg-border-2" />
             <div className="flex items-center gap-2">
