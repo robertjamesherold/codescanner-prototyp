@@ -19,7 +19,7 @@ const Optimieren = () => {
       topbar={<Layout.Topbar variant="optimieren" />}
       bottombar={<Layout.Bottombar variant="optimieren" />}
     >
-      <div className="mx-auto max-w-300 px-4  space-y-5 py-6">
+      <div className="mx-auto max-w-300 px-8  space-y-5 py-6">
         {/* Tab-Leiste (performance-farbig) */}
         <div className="flex gap-3 border-b border-border-1">
           {TABS.map((t) => {

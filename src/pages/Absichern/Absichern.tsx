@@ -143,7 +143,7 @@ const Absichern = ({ severity }: { severity: Severity }) => {
       bottombar={<Layout.Bottombar variant={severity} />}
     >
       {data ? (
-        <div className="mx-auto max-w-300 px-4 space-y-5 py-6">
+        <div className="mx-auto max-w-300 px-8 space-y-5 py-6">
           {/* Tab-Leiste (Severity-farbig) */}
           <div className="flex gap-3 border-b border-border-1">
             {data.tabs.map((t) => {

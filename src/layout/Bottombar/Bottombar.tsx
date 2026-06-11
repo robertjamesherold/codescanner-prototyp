@@ -47,7 +47,7 @@ const Bottombar = ({ variant }: { variant: BottombarVariant }) => {
       data-layer="Bottombar"
       className="w-full border-t border-border-1 bg-bg-2 px-7 py-6 shadow-[0px_-2px_6px_3px_rgba(0,0,0,0.06)]"
     >
-      <div className="mx-auto flex max-w-300 px-4 items-center justify-between gap-4">
+      <div className="mx-auto flex max-w-300 px-8 items-center justify-between gap-4">
         {back ? (
           <Button color="secondary" variant="outlined" leftIcon="ArrowLeft" label={back.label} onClick={() => navigate(back.to)} />
         ) : (
