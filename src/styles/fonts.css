@@ -1,0 +1,4 @@
+/* Fonts are loaded in index.html via <link rel="preconnect"> + Google Fonts
+   (faster than @import, which blocks CSS). Figtree 300–900, Azeret Mono 400/500. */
+
+

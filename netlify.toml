@@ -1,0 +1,17 @@
+# Netlify-Konfiguration für den CodeScanner-Prototyp (Vite/React SPA)
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA-Fallback: alle Routen auf index.html (Client-Routing via react-router).
+# (Redundant zu public/_redirects, aber schadet nicht und dokumentiert das Verhalten.)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Iframe-Einbettung auf die eigene Webseite beschränken (Eltern-Domain).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "frame-ancestors 'self' https://robertjamesherold.com https://www.robertjamesherold.com"

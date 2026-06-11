@@ -1,0 +1,20 @@
+/* ============================================================================
+   STYLES ENTRY
+   ----------------------------------------------------------------------------
+   Import order matters:
+   1. fonts       – webfonts (must load first)
+   2. tailwind    – Tailwind core + layers
+   3. tokens      – raw design-token values (light / dark)
+   4. theme       – map tokens to Tailwind utilities (@theme inline)
+   5. base        – element defaults (@layer base)
+   6. components  – composite classes (@layer components)
+   ========================================================================== */
+
+@import './fonts.css';
+@import './tailwind.css';
+
+@import './tokens.css';
+@import './theme.css';
+
+@import './base.css';
+@import './components.css';

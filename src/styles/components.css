@@ -1,0 +1,63 @@
+/* ============================================================================
+   COMPONENTS LAYER — reusable composite classes
+   ========================================================================== */
+
+@layer components {
+  /* Horizontal page gutter + max width */
+  .container-x {
+    @apply mx-auto w-full max-w-440 px-6 sm:px-10 lg:px-20;
+  }
+
+  /* Vertical section rhythm */
+  .section-y {
+    @apply py-20 sm:py-28 lg:py-40;
+  }
+
+  /* Lead paragraph */
+  .lede {
+    font-size: clamp(1rem, 0.925rem + 0.4vw, 1.125rem);
+    line-height: 1.65;
+    @apply text-text-2;
+  }
+
+  /* Display headline */
+  .display {
+    font-size: clamp(2.5rem, 1.5rem + 3.5vw, 5rem);
+    line-height: 1.02;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    text-wrap: pretty;
+    @apply font-display text-text-1;
+  }
+
+  .mono { font-family: 'Azeret Mono', ui-monospace, monospace; letter-spacing: 0.04em; }
+
+  .title {
+    font-size: clamp(2rem, 1.25rem + 3vw, 4rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-wrap: pretty;
+  }
+  
+  .card-base { @apply bg-grouped-1 border border-border-2 rounded-md px-8 py-12; box-shadow: var(--shadow-card); }
+
+}
+
+/* ============================================================================
+   LOGO — unterschiedliche Bilder für Light/Dark.
+   Spiegelt die Theme-Auflösung aus tokens.css:
+   default (light) → System-Dark (ohne manuelles light) → data-theme override.
+   ========================================================================== */
+.logo-dark { display: none; }
+.logo-light { display: block; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .logo-light { display: none; }
+  :root:not([data-theme='light']) .logo-dark { display: block; }
+}
+
+:root[data-theme='dark'] .logo-light { display: none; }
+:root[data-theme='dark'] .logo-dark { display: block; }
+:root[data-theme='light'] .logo-light { display: block; }
+:root[data-theme='light'] .logo-dark { display: none; }

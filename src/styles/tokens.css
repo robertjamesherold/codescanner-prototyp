@@ -1,0 +1,649 @@
+/* ============================================================================
+   DESIGN TOKENS — raw values
+   ----------------------------------------------------------------------------
+   Mode-independent primitives live in :root.
+
+   Color tokens resolve in this order:
+     1. `:root`                       → light values (the default)
+     2. system dark, no manual choice → dark values
+     3. `[data-theme="dark"|"light"]` → an explicit override set by the theme
+        toggle (see src/theme/theme.ts), which always wins.
+
+   `color-scheme` is set alongside so native UI (scrollbars, form controls)
+   matches. These raw vars are mapped to Tailwind utilities in theme.css.
+   ========================================================================== */
+
+:root {
+  /* --- Radius --- */
+  --radius-sm: 4px;
+  --radius-md: 5px;
+  --radius-lg: 10px;
+  --radius-full: 9999px;
+
+
+  /* Shared across schemes */
+  --transparency: hsla(0, 0%, 100%, 0);
+
+  /* Unified card elevation (Elevated/3 from the Figma design) */
+  --shadow-card: 0px 1px 3px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+
+  /* Upgrade-Block-Gradient (über bg-2 via mix-blend, gemäß Figma) */
+    --upgrade-gradient:  linear-gradient(180deg, hsl(244, 75%, 59%) 0%, hsl(220, 80%, 53%) 100%);
+
+}
+
+/* ============================================================================
+   LIGHT — default, and the explicit "light" override
+   ========================================================================== */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* --- Brand --- */
+  --primary: hsl(244, 75%, 59%);
+  --primary-hover: hsl(244, 78%, 53%);
+  --primary-pressed: hsl(244, 80%, 45%);
+  --primary-active: hsl(244, 77%, 56%);
+  --primary-disabled: hsl(244, 40%, 78%);
+
+  --secondary: hsl(215, 20%, 35%);
+  --secondary-hover: hsl(215, 22%, 30%);
+  --secondary-pressed: hsl(215, 24%, 26%);
+  --secondary-active: hsl(215, 21%, 33%);
+  --secondary-disabled: hsl(0, 0%, 67%);
+
+  /* --- Priority --- */
+  --critical: hsl(2, 78%, 35%);
+  --critical-hover: hsl(2, 80%, 31%);
+  --critical-pressed: hsl(2, 82%, 26%);
+  --critical-active: hsl(2, 79%, 33%);
+  --critical-disabled: hsl(2, 30%, 65%);
+
+  --high: hsl(28, 100%, 39%);
+  --high-hover: hsl(28, 100%, 35%);
+  --high-pressed: hsl(28, 100%, 30%);
+  --high-active: hsl(28, 100%, 37%);
+  --high-disabled: hsl(28, 40%, 70%);
+
+  --medium: hsl(45, 85%, 38%);
+  --medium-hover: hsl(45, 88%, 34%);
+  --medium-pressed: hsl(45, 90%, 30%);
+  --medium-active: hsl(45, 86%, 36%);
+  --medium-disabled: hsl(45, 35%, 70%);
+
+  --low: hsl(125, 35%, 38%);
+  --low-hover: hsl(125, 38%, 34%);
+  --low-pressed: hsl(125, 40%, 28%);
+  --low-active: hsl(125, 36%, 36%);
+  --low-disabled: hsl(125, 15%, 68%);
+
+  /* --- Category --- */
+  --performance: hsl(260, 80%, 58%);
+  --performance-hover: hsl(260, 83%, 52%);
+  --performance-pressed: hsl(260, 85%, 45%);
+  --performance-active: hsl(260, 81%, 55%);
+  --performance-disabled: hsl(260, 45%, 75%);
+
+  --quality: hsl(220, 80%, 53%);
+  --quality-hover: hsl(220, 83%, 48%);
+  --quality-pressed: hsl(220, 85%, 40%);
+  --quality-active: hsl(220, 81%, 50%);
+  --quality-disabled: hsl(220, 40%, 72%);
+
+  --security: hsl(190, 85%, 38%);
+  --security-hover: hsl(190, 88%, 34%);
+  --security-pressed: hsl(190, 90%, 28%);
+  --security-active: hsl(190, 86%, 36%);
+  --security-disabled: hsl(190, 35%, 70%);
+
+  /* --- Status --- */
+  --error: hsl(4, 75%, 45%);
+  --error-hover: hsl(4, 78%, 40%);
+  --error-pressed: hsl(4, 80%, 34%);
+  --error-active: hsl(4, 76%, 42%);
+  --error-disabled: hsl(4, 35%, 72%);
+
+  --warning: hsl(30, 85%, 38%);
+  --warning-hover: hsl(30, 88%, 34%);
+  --warning-pressed: hsl(30, 90%, 28%);
+  --warning-active: hsl(30, 86%, 36%);
+  --warning-disabled: hsl(30, 35%, 70%);
+
+  --info: hsl(200, 90%, 32%);
+  --info-hover: hsl(200, 92%, 28%);
+  --info-pressed: hsl(200, 94%, 24%);
+  --info-active: hsl(200, 91%, 30%);
+  --info-disabled: hsl(200, 35%, 70%);
+
+  --success: hsl(140, 60%, 42%);
+  --success-hover: hsl(140, 63%, 38%);
+  --success-pressed: hsl(140, 65%, 32%);
+  --success-active: hsl(140, 61%, 40%);
+  --success-disabled: hsl(140, 25%, 70%);
+
+  /* --- Code syntax --- */
+  --code-yellow: hsl(42, 100%, 30%);
+  --code-turkish: hsl(170, 100%, 24%);
+  --code-red: hsl(4, 75%, 40%);
+  --code-blue: hsl(220, 75%, 48%);
+  --code-cyan: hsl(190, 80%, 32%);
+  --code-green: hsl(125, 45%, 35%);
+  --code-white: hsl(215, 25%, 20%);
+
+  /* --- Surfaces: base backgrounds --- */
+  --bg-1: hsl(0, 0%, 100%);
+  --bg-1-hover: hsl(0, 0%, 97%);
+  --bg-1-pressed: hsl(0, 0%, 94%);
+  --bg-1-active: hsl(0, 0%, 98%);
+  --bg-1-disabled: hsl(0, 0%, 100%);
+
+  --bg-2: hsl(220, 30%, 97%);
+  --bg-2-hover: hsl(220, 30%, 94%);
+  --bg-2-pressed: hsl(220, 30%, 90%);
+  --bg-2-active: hsl(220, 30%, 95%);
+  --bg-2-disabled: hsl(220, 30%, 98%);
+
+  --bg-3: hsl(220, 30%, 94%);
+  --bg-3-hover: hsl(220, 30%, 91%);
+  --bg-3-pressed: hsl(220, 30%, 87%);
+  --bg-3-active: hsl(220, 30%, 92%);
+  --bg-3-disabled: hsl(220, 30%, 96%);
+
+  /* --- Surfaces: grouped (elevated) --- */
+  /* Mirrors the bg scale one step up, matching the dark-mode relationship. */
+  --grouped-1: hsl(220, 30%, 97%);
+  --grouped-1-hover: hsl(220, 30%, 94%);
+  --grouped-1-pressed: hsl(220, 30%, 90%);
+  --grouped-1-active: hsl(220, 30%, 95%);
+  --grouped-1-disabled: hsl(220, 30%, 98%);
+
+  --grouped-2: hsl(220, 30%, 94%);
+  --grouped-2-hover: hsl(220, 30%, 91%);
+  --grouped-2-pressed: hsl(220, 30%, 87%);
+  --grouped-2-active: hsl(220, 30%, 92%);
+  --grouped-2-disabled: hsl(220, 30%, 96%);
+
+  --grouped-3: hsl(220, 30%, 91%);
+  --grouped-3-hover: hsl(220, 30%, 88%);
+  --grouped-3-pressed: hsl(220, 30%, 84%);
+  --grouped-3-active: hsl(220, 30%, 89%);
+  --grouped-3-disabled: hsl(220, 30%, 94%);
+
+  /* --- Borders --- */
+  --border-1: hsl(215, 25%, 80%);
+  --border-1-hover: hsl(215, 30%, 70%);
+  --border-1-pressed: hsl(215, 35%, 60%);
+  --border-1-active: hsl(215, 28%, 75%);
+  --border-1-disabled: hsl(215, 20%, 90%);
+
+  --border-2: hsl(215, 25%, 90%);
+  --border-2-hover: hsl(215, 30%, 78%);
+  --border-2-pressed: hsl(215, 35%, 65%);
+  --border-2-active: hsl(215, 28%, 82%);
+  --border-2-disabled: hsl(215, 20%, 96%);
+
+  /* --- Text --- */
+  --text-1: hsl(220, 40%, 12%);
+  --text-1-hover: hsl(220, 40%, 9%);
+  --text-1-pressed: hsl(220, 40%, 6%);
+  --text-1-active: hsl(220, 40%, 10%);
+  --text-1-disabled: hsl(0, 0%, 47%);
+
+  --text-2: hsl(215, 25%, 30%);
+  --text-2-hover: hsl(215, 25%, 26%);
+  --text-2-pressed: hsl(215, 25%, 22%);
+  --text-2-active: hsl(215, 25%, 28%);
+  --text-2-disabled: hsl(0, 0%, 56%);
+
+  --text-3: hsl(215, 20%, 50%);
+  --text-3-hover: hsl(215, 20%, 45%);
+  --text-3-pressed: hsl(215, 20%, 40%);
+  --text-3-active: hsl(215, 20%, 48%);
+  --text-3-disabled: hsl(0, 0%, 68%);
+
+  --text-inverted: hsl(0, 0%, 100%);
+  --text-inverted-hover: hsl(0, 0%, 94%);
+  --text-inverted-pressed: hsl(0, 0%, 88%);
+  --text-inverted-active: hsl(0, 0%, 96%);
+  --text-inverted-disabled: hsl(0, 0%, 80%);
+
+  --text-disabled: hsl(215, 20%, 70%);
+
+  /* --- Icons --- */
+  --icon-1: hsl(215, 30%, 18%);
+  --icon-1-hover: hsl(215, 30%, 15%);
+  --icon-1-pressed: hsl(215, 30%, 12%);
+  --icon-1-active: hsl(215, 30%, 16%);
+  --icon-1-disabled: hsl(0, 0%, 50%);
+
+  --icon-2: hsl(215, 20%, 50%);
+  --icon-2-hover: hsl(215, 20%, 45%);
+  --icon-2-pressed: hsl(215, 20%, 40%);
+  --icon-2-active: hsl(215, 20%, 48%);
+  --icon-2-disabled: hsl(0, 0%, 68%);
+
+  --icon-disabled: hsl(215, 20%, 70%);
+
+  /* --- Effects --- */
+  --background-gradient:
+  radial-gradient(ellipse 1200px 600px at 80% -10%, hsla(244, 75%, 59%, 0.10), transparent 60%),
+  radial-gradient(ellipse 1000px 500px at -10% 30%, hsla(244, 75%, 59%, 0.06), transparent 60%);
+
+  .upgrade-gradient {
+    border-radius: var(--border-radius-base, 5px);
+    background: linear-gradient(336deg, rgba(75, 8, 66, 0.60) -20.2%, rgba(33, 58, 153, 0.70) 96.82%), var(--colors-neutrals-backgrounds-bg-secondary-default, #F7F8FB);
+    background: linear-gradient(336deg, color(display-p3 0.2667 0.0588 0.251 / 0.60) -20.2%, color(display-p3 0.1531 0.2267 0.5788 / 0.70) 96.82%), var(--colors-neutrals-backgrounds-bg-secondary-default, color(display-p3 0.9686 0.9725 0.9843));
+    background-blend-mode: hard-light, normal;
+  }
+  
+}
+
+/* ============================================================================
+   DARK — applied when the OS prefers dark and the user hasn't forced light
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    /* --- Brand --- */
+    --primary: hsl(241, 100%, 69%);
+    --primary-hover: hsl(241, 100%, 74%);
+    --primary-pressed: hsl(241, 100%, 78%);
+    --primary-active: hsl(241, 100%, 72%);
+    --primary-disabled: hsl(241, 25%, 35%);
+
+    --secondary: hsl(215, 18%, 50%);
+    --secondary-hover: hsl(215, 20%, 60%);
+    --secondary-pressed: hsl(215, 22%, 66%);
+    --secondary-active: hsl(215, 19%, 55%);
+    --secondary-disabled: hsl(0, 0%, 26%);
+
+    /* --- Priority --- */
+    --critical: hsl(357, 95%, 58%);
+    --critical-hover: hsl(357, 95%, 65%);
+    --critical-pressed: hsl(357, 95%, 70%);
+    --critical-active: hsl(357, 95%, 62%);
+    --critical-disabled: hsl(357, 40%, 30%);
+
+    --high: hsl(40, 100%, 52%);
+    --high-hover: hsl(40, 100%, 60%);
+    --high-pressed: hsl(40, 100%, 66%);
+    --high-active: hsl(40, 100%, 56%);
+    --high-disabled: hsl(40, 40%, 30%);
+
+    --medium: hsl(55, 100%, 64%);
+    --medium-hover: hsl(55, 100%, 72%);
+    --medium-pressed: hsl(55, 100%, 78%);
+    --medium-active: hsl(55, 100%, 68%);
+    --medium-disabled: hsl(55, 35%, 35%);
+
+    --low: hsl(140, 65%, 46%);
+    --low-hover: hsl(140, 70%, 54%);
+    --low-pressed: hsl(140, 72%, 60%);
+    --low-active: hsl(140, 68%, 50%);
+    --low-disabled: hsl(140, 30%, 30%);
+
+    /* --- Category --- */
+    --performance: hsl(260, 85%, 65%);
+    --performance-hover: hsl(260, 85%, 72%);
+    --performance-pressed: hsl(260, 85%, 78%);
+    --performance-active: hsl(260, 85%, 68%);
+    --performance-disabled: hsl(260, 30%, 35%);
+
+    --quality: hsl(215, 90%, 68%);
+    --quality-hover: hsl(215, 90%, 75%);
+    --quality-pressed: hsl(215, 90%, 80%);
+    --quality-active: hsl(215, 90%, 72%);
+    --quality-disabled: hsl(215, 30%, 35%);
+
+    --security: hsl(188, 85%, 55%);
+    --security-hover: hsl(188, 85%, 63%);
+    --security-pressed: hsl(188, 85%, 70%);
+    --security-active: hsl(188, 85%, 58%);
+    --security-disabled: hsl(188, 30%, 32%);
+
+    /* --- Status --- */
+    --error: hsl(357, 100%, 64%);
+    --error-hover: hsl(357, 100%, 72%);
+    --error-pressed: hsl(357, 100%, 78%);
+    --error-active: hsl(357, 100%, 68%);
+    --error-disabled: hsl(357, 35%, 32%);
+
+    --warning: hsl(42, 95%, 58%);
+    --warning-hover: hsl(42, 95%, 66%);
+    --warning-pressed: hsl(42, 95%, 72%);
+    --warning-active: hsl(42, 95%, 62%);
+    --warning-disabled: hsl(42, 30%, 32%);
+
+    --info: hsl(200, 90%, 60%);
+    --info-hover: hsl(200, 90%, 68%);
+    --info-pressed: hsl(200, 90%, 74%);
+    --info-active: hsl(200, 90%, 64%);
+    --info-disabled: hsl(200, 30%, 35%);
+
+    --success: hsl(90, 85%, 65%);
+    --success-hover: hsl(90, 85%, 72%);
+    --success-pressed: hsl(90, 85%, 78%);
+    --success-active: hsl(90, 85%, 68%);
+    --success-disabled: hsl(90, 30%, 35%);
+
+    /* --- Code syntax --- */
+    --code-yellow: hsl(45, 90%, 75%);
+    --code-turkish: hsl(165, 50%, 55%);
+    --code-red: hsl(0, 80%, 75%);
+    --code-blue: hsl(215, 90%, 68%);
+    --code-cyan: hsl(185, 85%, 70%);
+    --code-green: hsl(140, 70%, 70%);
+    --code-white: hsl(0, 0%, 80%);
+
+    /* --- Surfaces: base backgrounds --- */
+    --bg-1: hsl(225, 25%, 6%);
+    --bg-1-hover: hsl(225, 25%, 10%);
+    --bg-1-pressed: hsl(225, 25%, 14%);
+    --bg-1-active: hsl(225, 25%, 8%);
+    --bg-1-disabled: hsl(225, 25%, 5%);
+
+    --bg-2: hsl(225, 25%, 8%);
+    --bg-2-hover: hsl(225, 25%, 12%);
+    --bg-2-pressed: hsl(225, 25%, 16%);
+    --bg-2-active: hsl(225, 25%, 10%);
+    --bg-2-disabled: hsl(225, 25%, 6%);
+
+    --bg-3: hsl(225, 25%, 12%);
+    --bg-3-hover: hsl(225, 25%, 16%);
+    --bg-3-pressed: hsl(225, 25%, 20%);
+    --bg-3-active: hsl(225, 25%, 14%);
+    --bg-3-disabled: hsl(225, 25%, 10%);
+
+    /* --- Surfaces: grouped (elevated) --- */
+    --grouped-1: hsl(225, 25%, 8%);
+    --grouped-1-hover: hsl(225, 25%, 12%);
+    --grouped-1-pressed: hsl(225, 25%, 16%);
+    --grouped-1-active: hsl(225, 25%, 10%);
+    --grouped-1-disabled: hsl(225, 25%, 7%);
+
+    --grouped-2: hsl(225, 25%, 12%);
+    --grouped-2-hover: hsl(225, 25%, 16%);
+    --grouped-2-pressed: hsl(225, 25%, 20%);
+    --grouped-2-active: hsl(225, 25%, 14%);
+    --grouped-2-disabled: hsl(225, 25%, 10%);
+
+    --grouped-3: hsl(225, 25%, 16%);
+    --grouped-3-hover: hsl(225, 25%, 20%);
+    --grouped-3-pressed: hsl(225, 25%, 24%);
+    --grouped-3-active: hsl(225, 25%, 18%);
+    --grouped-3-disabled: hsl(225, 25%, 14%);
+
+    /* --- Borders --- */
+    --border-1: hsl(220, 25%, 20%);
+    --border-1-hover: hsl(220, 25%, 30%);
+    --border-1-pressed: hsl(220, 25%, 40%);
+    --border-1-active: hsl(220, 25%, 25%);
+    --border-1-disabled: hsl(220, 25%, 12%);
+
+    --border-2: hsl(220, 25%, 15%);
+    --border-2-hover: hsl(220, 25%, 25%);
+    --border-2-pressed: hsl(220, 25%, 35%);
+    --border-2-active: hsl(220, 25%, 20%);
+    --border-2-disabled: hsl(220, 25%, 10%);
+
+    /* --- Text --- */
+    --text-1: hsl(220, 30%, 96%);
+    --text-1-hover: hsl(0, 0%, 100%);
+    --text-1-pressed: hsl(0, 0%, 100%);
+    --text-1-active: hsl(220, 30%, 98%);
+    --text-1-disabled: hsl(0, 0%, 58%);
+
+    --text-2: hsl(220, 20%, 75%);
+    --text-2-hover: hsl(220, 20%, 80%);
+    --text-2-pressed: hsl(220, 20%, 85%);
+    --text-2-active: hsl(220, 20%, 78%);
+    --text-2-disabled: hsl(0, 0%, 45%);
+
+    --text-3: hsl(220, 15%, 65%);
+    --text-3-hover: hsl(220, 15%, 72%);
+    --text-3-pressed: hsl(220, 15%, 78%);
+    --text-3-active: hsl(220, 15%, 68%);
+    --text-3-disabled: hsl(0, 0%, 40%);
+
+    --text-inverted: hsl(220, 40%, 10%);
+    --text-inverted-hover: hsl(220, 40%, 18%);
+    --text-inverted-pressed: hsl(220, 40%, 25%);
+    --text-inverted-active: hsl(220, 40%, 15%);
+    --text-inverted-disabled: hsl(0, 0%, 26%);
+
+    --text-disabled: hsl(220, 15%, 45%);
+
+    /* --- Icons --- */
+    --icon-1: hsl(220, 25%, 85%);
+    --icon-1-hover: hsl(220, 25%, 90%);
+    --icon-1-pressed: hsl(220, 25%, 95%);
+    --icon-1-active: hsl(220, 25%, 88%);
+    --icon-1-disabled: hsl(0, 0%, 55%);
+
+    --icon-2: hsl(220, 15%, 65%);
+    --icon-2-hover: hsl(220, 15%, 72%);
+    --icon-2-pressed: hsl(220, 15%, 78%);
+    --icon-2-active: hsl(220, 15%, 68%);
+    --icon-2-disabled: hsl(0, 0%, 40%);
+
+    --icon-disabled: hsl(220, 15%, 45%);
+
+    /* --- Effects --- */
+    --background-gradient:
+    radial-gradient(ellipse 1200px 600px at 80% -10%, hsla(241, 100%, 69%, 0.10), transparent 60%),
+    radial-gradient(ellipse 1000px 500px at -10% 30%, hsla(220, 25%, 15%, 0.06), transparent 60%);
+  
+  .upgrade-gradient {
+    border-radius: var(--border-radius-base, 5px);
+background: linear-gradient(336deg, rgba(134, 30, 120, 0.60) -20.2%, rgba(35, 35, 118, 0.70) 96.82%), var(--colors-neutrals-backgrounds-bg-secondary-default, #0C111A);
+background: linear-gradient(336deg, color(display-p3 0.4827 0.1546 0.4579 / 0.60) -20.2%, color(display-p3 0.1388 0.1388 0.4448 / 0.70) 96.82%), var(--colors-neutrals-backgrounds-bg-secondary-default, color(display-p3 0.0549 0.0667 0.0941));
+background-blend-mode: lighten, normal;
+  }
+  }
+}
+
+/* ============================================================================
+   DARK — the explicit "dark" override (wins over the OS preference)
+   ========================================================================== */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* --- Brand --- */
+  --primary: hsl(241, 100%, 69%);
+  --primary-hover: hsl(241, 100%, 74%);
+  --primary-pressed: hsl(241, 100%, 78%);
+  --primary-active: hsl(241, 100%, 72%);
+  --primary-disabled: hsl(241, 25%, 35%);
+
+  --secondary: hsl(215, 18%, 50%);
+  --secondary-hover: hsl(215, 20%, 60%);
+  --secondary-pressed: hsl(215, 22%, 66%);
+  --secondary-active: hsl(215, 19%, 55%);
+  --secondary-disabled: hsl(0, 0%, 26%);
+
+  /* --- Priority --- */
+  --critical: hsl(357, 95%, 58%);
+  --critical-hover: hsl(357, 95%, 65%);
+  --critical-pressed: hsl(357, 95%, 70%);
+  --critical-active: hsl(357, 95%, 62%);
+  --critical-disabled: hsl(357, 40%, 30%);
+
+  --high: hsl(40, 100%, 52%);
+  --high-hover: hsl(40, 100%, 60%);
+  --high-pressed: hsl(40, 100%, 66%);
+  --high-active: hsl(40, 100%, 56%);
+  --high-disabled: hsl(40, 40%, 30%);
+
+  --medium: hsl(55, 100%, 64%);
+  --medium-hover: hsl(55, 100%, 72%);
+  --medium-pressed: hsl(55, 100%, 78%);
+  --medium-active: hsl(55, 100%, 68%);
+  --medium-disabled: hsl(55, 35%, 35%);
+
+  --low: hsl(140, 65%, 46%);
+  --low-hover: hsl(140, 70%, 54%);
+  --low-pressed: hsl(140, 72%, 60%);
+  --low-active: hsl(140, 68%, 50%);
+  --low-disabled: hsl(140, 30%, 30%);
+
+  /* --- Category --- */
+  --performance: hsl(260, 85%, 65%);
+  --performance-hover: hsl(260, 85%, 72%);
+  --performance-pressed: hsl(260, 85%, 78%);
+  --performance-active: hsl(260, 85%, 68%);
+  --performance-disabled: hsl(260, 30%, 35%);
+
+  --quality: hsl(215, 90%, 68%);
+  --quality-hover: hsl(215, 90%, 75%);
+  --quality-pressed: hsl(215, 90%, 80%);
+  --quality-active: hsl(215, 90%, 72%);
+  --quality-disabled: hsl(215, 30%, 35%);
+
+  --security: hsl(188, 85%, 55%);
+  --security-hover: hsl(188, 85%, 63%);
+  --security-pressed: hsl(188, 85%, 70%);
+  --security-active: hsl(188, 85%, 58%);
+  --security-disabled: hsl(188, 30%, 32%);
+
+  /* --- Status --- */
+  --error: hsl(357, 100%, 64%);
+  --error-hover: hsl(357, 100%, 72%);
+  --error-pressed: hsl(357, 100%, 78%);
+  --error-active: hsl(357, 100%, 68%);
+  --error-disabled: hsl(357, 35%, 32%);
+
+  --warning: hsl(42, 95%, 58%);
+  --warning-hover: hsl(42, 95%, 66%);
+  --warning-pressed: hsl(42, 95%, 72%);
+  --warning-active: hsl(42, 95%, 62%);
+  --warning-disabled: hsl(42, 30%, 32%);
+
+  --info: hsl(200, 90%, 60%);
+  --info-hover: hsl(200, 90%, 68%);
+  --info-pressed: hsl(200, 90%, 74%);
+  --info-active: hsl(200, 90%, 64%);
+  --info-disabled: hsl(200, 30%, 35%);
+
+  --success: hsl(90, 85%, 65%);
+  --success-hover: hsl(90, 85%, 72%);
+  --success-pressed: hsl(90, 85%, 78%);
+  --success-active: hsl(90, 85%, 68%);
+  --success-disabled: hsl(90, 30%, 35%);
+
+  /* --- Code syntax --- */
+  --code-yellow: hsl(45, 90%, 75%);
+  --code-turkish: hsl(165, 50%, 55%);
+  --code-red: hsl(0, 80%, 75%);
+  --code-blue: hsl(215, 90%, 68%);
+  --code-cyan: hsl(185, 85%, 70%);
+  --code-green: hsl(140, 70%, 70%);
+  --code-white: hsl(0, 0%, 80%);
+
+  /* --- Surfaces: base backgrounds --- */
+  --bg-1: hsl(225, 25%, 6%);
+  --bg-1-hover: hsl(225, 25%, 10%);
+  --bg-1-pressed: hsl(225, 25%, 14%);
+  --bg-1-active: hsl(225, 25%, 8%);
+  --bg-1-disabled: hsl(225, 25%, 5%);
+
+  --bg-2: hsl(225, 25%, 8%);
+  --bg-2-hover: hsl(225, 25%, 12%);
+  --bg-2-pressed: hsl(225, 25%, 16%);
+  --bg-2-active: hsl(225, 25%, 10%);
+  --bg-2-disabled: hsl(225, 25%, 6%);
+
+  --bg-3: hsl(225, 25%, 12%);
+  --bg-3-hover: hsl(225, 25%, 16%);
+  --bg-3-pressed: hsl(225, 25%, 20%);
+  --bg-3-active: hsl(225, 25%, 14%);
+  --bg-3-disabled: hsl(225, 25%, 10%);
+
+  /* --- Surfaces: grouped (elevated) --- */
+  --grouped-1: hsl(225, 25%, 8%);
+  --grouped-1-hover: hsl(225, 25%, 12%);
+  --grouped-1-pressed: hsl(225, 25%, 16%);
+  --grouped-1-active: hsl(225, 25%, 10%);
+  --grouped-1-disabled: hsl(225, 25%, 7%);
+
+  --grouped-2: hsl(225, 25%, 12%);
+  --grouped-2-hover: hsl(225, 25%, 16%);
+  --grouped-2-pressed: hsl(225, 25%, 20%);
+  --grouped-2-active: hsl(225, 25%, 14%);
+  --grouped-2-disabled: hsl(225, 25%, 10%);
+
+  --grouped-3: hsl(225, 25%, 16%);
+  --grouped-3-hover: hsl(225, 25%, 20%);
+  --grouped-3-pressed: hsl(225, 25%, 24%);
+  --grouped-3-active: hsl(225, 25%, 18%);
+  --grouped-3-disabled: hsl(225, 25%, 14%);
+
+  /* --- Borders --- */
+  --border-1: hsl(220, 25%, 20%);
+  --border-1-hover: hsl(220, 25%, 30%);
+  --border-1-pressed: hsl(220, 25%, 40%);
+  --border-1-active: hsl(220, 25%, 25%);
+  --border-1-disabled: hsl(220, 25%, 12%);
+
+  --border-2: hsl(220, 25%, 15%);
+  --border-2-hover: hsl(220, 25%, 25%);
+  --border-2-pressed: hsl(220, 25%, 35%);
+  --border-2-active: hsl(220, 25%, 20%);
+  --border-2-disabled: hsl(220, 25%, 10%);
+
+  /* --- Text --- */
+  --text-1: hsl(220, 30%, 96%);
+  --text-1-hover: hsl(0, 0%, 100%);
+  --text-1-pressed: hsl(0, 0%, 100%);
+  --text-1-active: hsl(220, 30%, 98%);
+  --text-1-disabled: hsl(0, 0%, 58%);
+
+  --text-2: hsl(220, 20%, 75%);
+  --text-2-hover: hsl(220, 20%, 80%);
+  --text-2-pressed: hsl(220, 20%, 85%);
+  --text-2-active: hsl(220, 20%, 78%);
+  --text-2-disabled: hsl(0, 0%, 45%);
+
+  --text-3: hsl(220, 15%, 65%);
+  --text-3-hover: hsl(220, 15%, 72%);
+  --text-3-pressed: hsl(220, 15%, 78%);
+  --text-3-active: hsl(220, 15%, 68%);
+  --text-3-disabled: hsl(0, 0%, 40%);
+
+  --text-inverted: hsl(220, 40%, 10%);
+  --text-inverted-hover: hsl(220, 40%, 18%);
+  --text-inverted-pressed: hsl(220, 40%, 25%);
+  --text-inverted-active: hsl(220, 40%, 15%);
+  --text-inverted-disabled: hsl(0, 0%, 26%);
+
+  --text-disabled: hsl(220, 15%, 45%);
+
+  /* --- Icons --- */
+  --icon-1: hsl(220, 25%, 85%);
+  --icon-1-hover: hsl(220, 25%, 90%);
+  --icon-1-pressed: hsl(220, 25%, 95%);
+  --icon-1-active: hsl(220, 25%, 88%);
+  --icon-1-disabled: hsl(0, 0%, 55%);
+
+  --icon-2: hsl(220, 15%, 65%);
+  --icon-2-hover: hsl(220, 15%, 72%);
+  --icon-2-pressed: hsl(220, 15%, 78%);
+  --icon-2-active: hsl(220, 15%, 68%);
+  --icon-2-disabled: hsl(0, 0%, 40%);
+
+  --icon-disabled: hsl(220, 15%, 45%);
+
+  /* --- Effects --- */
+  --background-gradient:
+  radial-gradient(ellipse 1200px 600px at 80% -10%, hsla(241, 100%, 69%, 0.10), transparent 60%),
+  radial-gradient(ellipse 1000px 500px at -10% 30%, hsla(220, 25%, 15%, 0.06), transparent 60%);
+
+  .upgrade-gradient {
+    border-radius: var(--border-radius-base, 5px);
+background: linear-gradient(336deg, rgba(134, 30, 120, 0.60) -20.2%, rgba(35, 35, 118, 0.70) 96.82%), var(--colors-neutrals-backgrounds-bg-secondary-default, #0C111A);
+background: linear-gradient(336deg, color(display-p3 0.4827 0.1546 0.4579 / 0.60) -20.2%, color(display-p3 0.1388 0.1388 0.4448 / 0.70) 96.82%), var(--colors-neutrals-backgrounds-bg-secondary-default, color(display-p3 0.0549 0.0667 0.0941));
+background-blend-mode: lighten, normal;
+  }
+  
+
+}

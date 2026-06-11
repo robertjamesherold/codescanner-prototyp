@@ -1,0 +1,231 @@
+/* ============================================================================
+   TAILWIND THEME MAPPING
+   ----------------------------------------------------------------------------
+   Exposes the raw tokens from tokens.css as Tailwind theme values so utilities
+   like `bg-primary`, `text-text-2`, `border-border-1`, `p-4`, `rounded-md`
+   are generated. `inline` keeps the var() reference so light/dark switching
+   works at runtime without recompiling.
+   ========================================================================== */
+
+@theme inline {
+  --color-transparency: var(--transparency);
+
+  /* --- Brand --- */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-pressed: var(--primary-pressed);
+  --color-primary-active: var(--primary-active);
+  --color-primary-disabled: var(--primary-disabled);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-pressed: var(--secondary-pressed);
+  --color-secondary-active: var(--secondary-active);
+  --color-secondary-disabled: var(--secondary-disabled);
+
+  /* --- Priority --- */
+  --color-critical: var(--critical);
+  --color-critical-hover: var(--critical-hover);
+  --color-critical-pressed: var(--critical-pressed);
+  --color-critical-active: var(--critical-active);
+  --color-critical-disabled: var(--critical-disabled);
+
+  --color-high: var(--high);
+  --color-high-hover: var(--high-hover);
+  --color-high-pressed: var(--high-pressed);
+  --color-high-active: var(--high-active);
+  --color-high-disabled: var(--high-disabled);
+
+  --color-medium: var(--medium);
+  --color-medium-hover: var(--medium-hover);
+  --color-medium-pressed: var(--medium-pressed);
+  --color-medium-active: var(--medium-active);
+  --color-medium-disabled: var(--medium-disabled);
+
+  --color-low: var(--low);
+  --color-low-hover: var(--low-hover);
+  --color-low-pressed: var(--low-pressed);
+  --color-low-active: var(--low-active);
+  --color-low-disabled: var(--low-disabled);
+
+  /* --- Category --- */
+  --color-performance: var(--performance);
+  --color-performance-hover: var(--performance-hover);
+  --color-performance-pressed: var(--performance-pressed);
+  --color-performance-active: var(--performance-active);
+  --color-performance-disabled: var(--performance-disabled);
+
+  --color-quality: var(--quality);
+  --color-quality-hover: var(--quality-hover);
+  --color-quality-pressed: var(--quality-pressed);
+  --color-quality-active: var(--quality-active);
+  --color-quality-disabled: var(--quality-disabled);
+
+  --color-security: var(--security);
+  --color-security-hover: var(--security-hover);
+  --color-security-pressed: var(--security-pressed);
+  --color-security-active: var(--security-active);
+  --color-security-disabled: var(--security-disabled);
+
+  /* --- Status --- */
+  --color-error: var(--error);
+  --color-error-hover: var(--error-hover);
+  --color-error-pressed: var(--error-pressed);
+  --color-error-active: var(--error-active);
+  --color-error-disabled: var(--error-disabled);
+
+  --color-warning: var(--warning);
+  --color-warning-hover: var(--warning-hover);
+  --color-warning-pressed: var(--warning-pressed);
+  --color-warning-active: var(--warning-active);
+  --color-warning-disabled: var(--warning-disabled);
+
+  --color-info: var(--info);
+  --color-info-hover: var(--info-hover);
+  --color-info-pressed: var(--info-pressed);
+  --color-info-active: var(--info-active);
+  --color-info-disabled: var(--info-disabled);
+
+  --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
+  --color-success-pressed: var(--success-pressed);
+  --color-success-active: var(--success-active);
+  --color-success-disabled: var(--success-disabled);
+
+  /* --- Code syntax --- */
+  --color-code-yellow: var(--code-yellow);
+  --color-code-turkish: var(--code-turkish);
+  --color-code-red: var(--code-red);
+  --color-code-blue: var(--code-blue);
+  --color-code-cyan: var(--code-cyan);
+  --color-code-green: var(--code-green);
+  --color-code-white: var(--code-white);
+
+  /* --- Surfaces: base backgrounds --- */
+  --color-bg-1: var(--bg-1);
+  --color-bg-1-hover: var(--bg-1-hover);
+  --color-bg-1-pressed: var(--bg-1-pressed);
+  --color-bg-1-active: var(--bg-1-active);
+  --color-bg-1-disabled: var(--bg-1-disabled);
+
+  --color-bg-2: var(--bg-2);
+  --color-bg-2-hover: var(--bg-2-hover);
+  --color-bg-2-pressed: var(--bg-2-pressed);
+  --color-bg-2-active: var(--bg-2-active);
+  --color-bg-2-disabled: var(--bg-2-disabled);
+
+  --color-bg-3: var(--bg-3);
+  --color-bg-3-hover: var(--bg-3-hover);
+  --color-bg-3-pressed: var(--bg-3-pressed);
+  --color-bg-3-active: var(--bg-3-active);
+  --color-bg-3-disabled: var(--bg-3-disabled);
+
+  /* --- Surfaces: grouped (elevated) --- */
+  --color-grouped-1: var(--grouped-1);
+  --color-grouped-1-hover: var(--grouped-1-hover);
+  --color-grouped-1-pressed: var(--grouped-1-pressed);
+  --color-grouped-1-active: var(--grouped-1-active);
+  --color-grouped-1-disabled: var(--grouped-1-disabled);
+
+  --color-grouped-2: var(--grouped-2);
+  --color-grouped-2-hover: var(--grouped-2-hover);
+  --color-grouped-2-pressed: var(--grouped-2-pressed);
+  --color-grouped-2-active: var(--grouped-2-active);
+  --color-grouped-2-disabled: var(--grouped-2-disabled);
+
+  --color-grouped-3: var(--grouped-3);
+  --color-grouped-3-hover: var(--grouped-3-hover);
+  --color-grouped-3-pressed: var(--grouped-3-pressed);
+  --color-grouped-3-active: var(--grouped-3-active);
+  --color-grouped-3-disabled: var(--grouped-3-disabled);
+
+  /* --- Borders --- */
+  --color-border-1: var(--border-1);
+  --color-border-1-hover: var(--border-1-hover);
+  --color-border-1-pressed: var(--border-1-pressed);
+  --color-border-1-active: var(--border-1-active);
+  --color-border-1-disabled: var(--border-1-disabled);
+
+  --color-border-2: var(--border-2);
+  --color-border-2-hover: var(--border-2-hover);
+  --color-border-2-pressed: var(--border-2-pressed);
+  --color-border-2-active: var(--border-2-active);
+  --color-border-2-disabled: var(--border-2-disabled);
+
+  /* --- Text --- */
+  --color-text-1: var(--text-1);
+  --color-text-1-hover: var(--text-1-hover);
+  --color-text-1-pressed: var(--text-1-pressed);
+  --color-text-1-active: var(--text-1-active);
+  --color-text-1-disabled: var(--text-1-disabled);
+
+  --color-text-2: var(--text-2);
+  --color-text-2-hover: var(--text-2-hover);
+  --color-text-2-pressed: var(--text-2-pressed);
+  --color-text-2-active: var(--text-2-active);
+  --color-text-2-disabled: var(--text-2-disabled);
+
+  --color-text-3: var(--text-3);
+  --color-text-3-hover: var(--text-3-hover);
+  --color-text-3-pressed: var(--text-3-pressed);
+  --color-text-3-active: var(--text-3-active);
+  --color-text-3-disabled: var(--text-3-disabled);
+
+  --color-text-inverted: var(--text-inverted);
+  --color-text-inverted-hover: var(--text-inverted-hover);
+  --color-text-inverted-pressed: var(--text-inverted-pressed);
+  --color-text-inverted-active: var(--text-inverted-active);
+  --color-text-inverted-disabled: var(--text-inverted-disabled);
+
+  --color-text-disabled: var(--text-disabled);
+
+  /* --- Icons --- */
+  --color-icon-1: var(--icon-1);
+  --color-icon-1-hover: var(--icon-1-hover);
+  --color-icon-1-pressed: var(--icon-1-pressed);
+  --color-icon-1-active: var(--icon-1-active);
+  --color-icon-1-disabled: var(--icon-1-disabled);
+
+  --color-icon-2: var(--icon-2);
+  --color-icon-2-hover: var(--icon-2-hover);
+  --color-icon-2-pressed: var(--icon-2-pressed);
+  --color-icon-2-active: var(--icon-2-active);
+  --color-icon-2-disabled: var(--icon-2-disabled);
+
+  /* --- Radius --- */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-full: var(--radius-full);
+
+
+  /* --- Typography --- */
+  --font-sans: 'Figtree', system-ui, sans-serif;
+  --font-display: 'Figtree', system-ui, sans-serif;
+  --font-mono: 'Azeret Mono', monospace;
+  --font-size: 1rem;
+
+  --text-2xl: 32px;
+  --text-xl: 20px;
+  --text-lg: 18px;
+  --text-base: 16px;
+  --text-md: 16px;
+  --text-sm: 13px;
+
+  --leading-sm: 19.5px;
+  --leading-md: 24px;
+  --leading-lg: 24px;
+  --leading-xl: 27px;
+  --leading-2xl: 36px;
+
+
+
+  /* --- Effects --- */
+  --background-gradient: var(--background-gradient);
+}
+
+.upgrade-gradient {
+  border-radius: var(--radius-md);
+  background: linear-gradient(336deg, rgba(75, 8, 66, 0.60) -20.2%, rgba(33, 58, 153, 0.70) 96.82%), var(--color-bg-2);
+  background-blend-mode: hard-light;
+}
