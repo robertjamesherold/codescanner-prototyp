@@ -11,6 +11,18 @@ const DOPPELTE_DATEIEN = [
   { label: "types-v2.d.ts überlappt mit types.d.ts", severity: "mittel" as const, path: "src/types/types-v2.d.ts", loc: 45, detail: "98.7% Übereinstimmung. Abweichung: 2 Kommentarzeilen.", applyable: true },
 ];
 
+type AccordionRow = (typeof DOPPELTE_DATEIEN)[number];
+
+/** Accordion-Gruppen je Tab-Kategorie (Redundanz / Ballast / Struktur). */
+const ACCORDIONS: { title: string; category: string; rows: AccordionRow[] }[] = [
+  { title: "Doppelte Dateien", category: "Redundanz", rows: DOPPELTE_DATEIEN },
+  { title: "Doppelter Code", category: "Redundanz", rows: [] },
+  { title: "Toter Code", category: "Ballast", rows: [] },
+  { title: "Ungenutzte Exports", category: "Ballast", rows: [] },
+  { title: "Namen-Inkonsistenzen", category: "Struktur", rows: [] },
+  { title: "Ordnerstruktur", category: "Struktur", rows: [] },
+];
+
 /** Seite "Bereinigen" (/bereinigen) — Tabs + Stat-Karten + Accordions (gemäß Figma). */
 const Bereinigen = () => {
   const [active, setActive] = useState("Alle");
@@ -37,12 +49,9 @@ const Bereinigen = () => {
           </div>
 
           <div className="col-span-4 flex flex-col gap-4">
-            <components.Accordion title="Doppelte Dateien" defaultOpen={false} rows={DOPPELTE_DATEIEN} />
-            <components.Accordion title="Doppelter Code" defaultOpen={false} rows={[]} />
-            <components.Accordion title="Toter Code" defaultOpen={false} rows={[]} />
-            <components.Accordion title="Ungenutzte Exports" defaultOpen={false} rows={[]} />
-            <components.Accordion title="Namen-Inkonsistenzen" defaultOpen={false} rows={[]} />
-            <components.Accordion title="Ordnerstruktur" defaultOpen={false} rows={[]} />
+            {ACCORDIONS.filter((a) => active === "Alle" || a.category === active).map((a) => (
+              <components.Accordion key={a.title} title={a.title} defaultOpen={false} rows={a.rows} />
+            ))}
           </div>
         </div>
       </div>

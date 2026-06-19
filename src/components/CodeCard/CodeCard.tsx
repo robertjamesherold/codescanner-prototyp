@@ -139,6 +139,21 @@ const CodeCard = ({
   onNext,
 }: CodeCardProps) => {
   const [fixed, setFixed] = useState(false);
+  const [index, setIndex] = useState(fileIndex);
+
+  const goPrev = () => {
+    if (index <= 1) return;
+    setIndex((i) => i - 1);
+    setFixed(false);
+    onPrev?.();
+  };
+
+  const goNext = () => {
+    if (index >= fileTotal) return;
+    setIndex((i) => i + 1);
+    setFixed(false);
+    onNext?.();
+  };
 
   return (
     <div data-layer="CodeCard" className="flex w-full flex-col gap-6 rounded-md border border-border-2 bg-grouped-1 p-5">
@@ -146,10 +161,10 @@ const CodeCard = ({
       <div className="flex items-center gap-2">
         <span className="text-base text-text-disabled whitespace-nowrap">Fortschritt:</span>
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-grouped-2">
-          <span className="block h-full rounded-full" style={{ width: `${(fileIndex / fileTotal) * 100}%`, backgroundColor: accent }} />
+          <span className="block h-full rounded-full transition-all duration-300" style={{ width: `${(index / fileTotal) * 100}%`, backgroundColor: accent }} />
         </div>
         <span className="text-base text-text-disabled whitespace-nowrap">
-          Datei {fileIndex} / {fileTotal}
+          Datei {index} / {fileTotal}
         </span>
       </div>
 
@@ -173,19 +188,20 @@ const CodeCard = ({
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <Link label="Vorherige Datei" rightIcon={null} onClick={onPrev} />
+        <Link label="Vorherige Datei" rightIcon={null} onClick={goPrev} disabled={index <= 1} />
         <div className="flex items-center gap-3">
           <Button
             color="success"
             variant="filled"
             leftIcon="Check"
             label={fixed ? "Als gefixt markiert" : "Als gefixt markieren"}
+            disabled={fixed}
             onClick={() => {
               setFixed(true);
               onMarkFixed?.();
             }}
           />
-          <Button color="primary" variant="filled" label="Nächste Datei" onClick={onNext} />
+          <Button color="primary" variant="filled" label="Nächste Datei" onClick={goNext} disabled={index >= fileTotal} />
         </div>
       </div>
     </div>

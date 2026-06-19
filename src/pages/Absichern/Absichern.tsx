@@ -167,9 +167,16 @@ const Absichern = ({ severity }: { severity: Severity }) => {
           {/* Grid: links CWE-Karten, rechts Code-Karte */}
           <div className="grid grid-cols-6 gap-5">
             <div className="col-span-2 flex flex-col gap-4">
-              {data.cards.map((c) => (
-                <components.CweCard key={c.id} severity={severity} {...c} />
-              ))}
+              {data.cards
+                .filter((c) => active === "Alle" || c.id === active)
+                .map((c) => (
+                  <components.CweCard
+                    key={c.id}
+                    severity={severity}
+                    {...c}
+                    onAction={() => setActive(c.id)}
+                  />
+                ))}
             </div>
             <div className="col-span-4">
               <components.CodeCard

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import components from "@/components";
 import Icon from "@/assets/icons";
 import hooks from "@/hooks";
@@ -19,7 +20,9 @@ const SidebarProjekt = () => {
     >
       {/* Logo */}
       <div className={`flex h-20 transition-all duration-300 items-center ${isSideBarOpen ? "px-8" : "px-4 justify-center"}`}>
-        <components.Logo showWordmark={isSideBarOpen} />
+        <Link to="/übersicht" aria-label="Zur Übersicht" className="cursor-pointer">
+          <components.Logo showWordmark={isSideBarOpen} />
+        </Link>
       </div>
 
       {/* Body: Nav oben, Upgrade unten */}

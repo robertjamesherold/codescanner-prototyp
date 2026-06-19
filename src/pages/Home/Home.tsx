@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import components from "@/components";
 import { LogoIcon } from "@/components/Logo";
 
@@ -6,6 +7,11 @@ import { LogoIcon } from "@/components/Logo";
  * Großes Logo, Heading + Untertitel und 4 StartButtons (zwei davon "Pro"/disabled).
  */
 const Home = () => {
+  const navigate = useNavigate();
+
+  // Ein Import startet die Analyse → direkt in die Projekt-Übersicht.
+  const startImport = () => navigate("/übersicht");
+
   return (
     <div className="flex h-full w-full items-center justify-center overflow-y-auto p-8">
       <div className="flex w-full max-w-[516px] flex-col items-center gap-8 py-8">
@@ -29,11 +35,13 @@ const Home = () => {
             variant="folder"
             title="Lokalen Ordner öffnen"
             description="Importieren Sie einen Ordner von Ihrem Computer."
+            onClick={startImport}
           />
           <components.StartButton
             variant="files"
             title="Dateien hochladen"
             description="Wählen Sie einzelne Dateien zur Analyse aus."
+            onClick={startImport}
           />
           <components.StartButton
             variant="github"

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Icon from "@/assets/icons";
 import Button from "@/components/Button";
 import SeverityBadge from "@/components/SeverityBadge";
@@ -15,7 +17,21 @@ type TopbarProps = {
   onBack?: () => void;
   onSkip?: () => void;
   onPrimaryAction?: () => void;
+  /** Nur bei variant="recent": gesteuertes Suchfeld. */
+  search?: string;
+  onSearchChange?: (value: string) => void;
 };
+
+/** Nächste Absichern-Severity (für „Nächstes Pattern" / „Überspringen"). */
+const NEXT_SEVERITY_ROUTE: Record<Severity, string> = {
+  kritisch: "/absichern/hoch",
+  hoch: "/absichern/mittel",
+  mittel: "/absichern/niedrig",
+  niedrig: "/optimieren",
+};
+
+/** Recent-Filter-Tabs. */
+const RECENT_FILTERS = ["Zuletzt angesehen", "Freigegebene Dateien", "Geteilte Projekte"];
 
 /** Headline-Konfiguration je Seite: Icon, Farb-Token, Titel. */
 const HEAD: Record<TopbarVariant, { icon: IconName; color: string; title: string }> = {
@@ -136,9 +152,38 @@ const Topbar = ({
   onBack,
   onSkip,
   onPrimaryAction,
+  search,
+  onSearchChange,
 }: TopbarProps) => {
+  const navigate = useNavigate();
+  const [recentFilter, setRecentFilter] = useState(RECENT_FILTERS[0]);
+
   const wrapper =
     "w-full border-b border-border-1 bg-bg-2  py-6 shadow-[0px_1px_2px_rgba(0,0,0,0.15),0px_1px_3px_rgba(0,0,0,0.1)]";
+
+  // Standard-Aktion je Seite — durch onPrimaryAction/onSkip überschreibbar.
+  const defaultPrimary: () => void =
+    variant === "recent"
+      ? () => navigate("/home")
+      : variant === "bereinigen"
+        ? () => navigate("/absichern/kritisch")
+        : variant === "absichern"
+          ? () => navigate(NEXT_SEVERITY_ROUTE[severity])
+          : variant === "optimieren"
+            ? () => navigate("/übersicht")
+            : () => {};
+
+  const defaultSkip: () => void =
+    variant === "bereinigen"
+      ? () => navigate("/absichern/kritisch")
+      : variant === "absichern"
+        ? () => navigate(NEXT_SEVERITY_ROUTE[severity])
+        : variant === "optimieren"
+          ? () => navigate("/übersicht")
+          : () => {};
+
+  const handlePrimary = onPrimaryAction ?? defaultPrimary;
+  const handleSkip = onSkip ?? defaultSkip;
 
   // --- recent: Sonderlayout ---
   if (variant === "recent") {
@@ -153,15 +198,23 @@ const Topbar = ({
             <div className="flex flex-col gap-4">
               <Headline variant="recent" />
               <div className="flex items-center gap-2">
-                <button type="button" className="rounded-sm border border-border-1 bg-grouped-1 px-2 py-1 text-sm text-text-1 cursor-pointer">
-                  Zuletzt angesehen
-                </button>
-                <button type="button" className="rounded-sm px-2 py-1 text-sm text-text-2 cursor-pointer hover:text-text-2-hover">
-                  Freigegebene Dateien
-                </button>
-                <button type="button" className="rounded-sm px-2 py-1 text-sm text-text-2 cursor-pointer hover:text-text-2-hover">
-                  Geteilte Projekte
-                </button>
+                {RECENT_FILTERS.map((f) => {
+                  const isActive = recentFilter === f;
+                  return (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setRecentFilter(f)}
+                      className={`rounded-sm px-2 py-1 text-sm cursor-pointer ${
+                        isActive
+                          ? "border border-border-1 bg-grouped-1 text-text-1"
+                          : "text-text-2 hover:text-text-2-hover"
+                      }`}
+                    >
+                      {f}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -171,6 +224,8 @@ const Topbar = ({
                 <input
                   className="w-full bg-transparent text-base text-text-1 outline-none placeholder:text-text-3"
                   placeholder="Suche"
+                  value={search ?? ""}
+                  onChange={(e) => onSearchChange?.(e.target.value)}
                 />
               </div>
               <Button
@@ -178,7 +233,7 @@ const Topbar = ({
                 variant="filled"
                 label="Neues Projekt erstellen"
                 rightIcon="Plus"
-                onClick={onPrimaryAction}
+                onClick={handlePrimary}
               />
             </div>
           </div>
@@ -198,22 +253,22 @@ const Topbar = ({
   if (variant === "bereinigen") {
     actions = (
       <>
-        <Button color="primary" variant="filled" label="15 Sicher bereinigen" leftIcon="Sparkles" onClick={onPrimaryAction} />
-        <Button color="secondary" variant="outlined" label="Überspringen" onClick={onSkip} />
+        <Button color="primary" variant="filled" label="15 Sicher bereinigen" leftIcon="Sparkles" onClick={handlePrimary} />
+        <Button color="secondary" variant="outlined" label="Überspringen" onClick={handleSkip} />
       </>
     );
   } else if (variant === "absichern") {
     actions = (
       <>
-        <Button color={SEVERITY_COLOR[severity]} variant="filled" label="Nächstes Pattern" leftIcon="ArrowRight" onClick={onPrimaryAction} />
-        <Button color="secondary" variant="outlined" label="Überspringen" onClick={onSkip} />
+        <Button color={SEVERITY_COLOR[severity]} variant="filled" label="Nächstes Pattern" leftIcon="ArrowRight" onClick={handlePrimary} />
+        <Button color="secondary" variant="outlined" label="Überspringen" onClick={handleSkip} />
       </>
     );
   } else if (variant === "optimieren") {
     actions = (
       <>
-        <Button color="success" variant="filled" label="6 Sicher optimieren" leftIcon="Check" onClick={onPrimaryAction} />
-        <Button color="secondary" variant="outlined" label="Überspringen" onClick={onSkip} />
+        <Button color="success" variant="filled" label="6 Sicher optimieren" leftIcon="Check" onClick={handlePrimary} />
+        <Button color="secondary" variant="outlined" label="Überspringen" onClick={handleSkip} />
       </>
     );
   }

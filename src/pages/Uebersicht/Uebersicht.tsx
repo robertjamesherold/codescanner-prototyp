@@ -1,8 +1,12 @@
+import { useNavigate } from "react-router-dom";
 import Layout from "@/layout";
 import components from "@/components";
 
 /** Seite "Übersicht" (/übersicht) — Topbar + Karten-Grid (gemäß Figma). */
-const Uebersicht = () => (
+const Uebersicht = () => {
+  const navigate = useNavigate();
+
+  return (
   <Layout.Content
     topbar={<Layout.Topbar variant="uebersicht" />}
     bottombar={<Layout.Bottombar variant="uebersicht" />}
@@ -10,10 +14,13 @@ const Uebersicht = () => (
     <div className="mx-auto grid max-w-300 px-8  grid-cols-6 gap-5 py-12">
       {/* Reihe 1 */}
       <div className="col-span-4">
-        <components.RecommendedStepCard />
+        <components.RecommendedStepCard
+          onPrimary={() => navigate("/bereinigen")}
+          onSkip={() => navigate("/absichern/kritisch")}
+        />
       </div>
       <div className="col-span-2">
-        <components.RiskCard />
+        <components.RiskCard onAction={() => navigate("/absichern/kritisch")} />
       </div>
 
       {/* Reihe 2 */}
@@ -55,6 +62,7 @@ const Uebersicht = () => (
       </div>
     </div>
   </Layout.Content>
-);
+  );
+};
 
 export default Uebersicht;
