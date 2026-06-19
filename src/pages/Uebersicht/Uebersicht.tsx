@@ -24,9 +24,9 @@ const Uebersicht = () => (
           title="Bereinigung"
           primaryValue="28"
           metrics={[
-            { value: "120", label: "Dopplungen" },
-            { value: "931", label: "LOC" },
-            { value: "~8", label: "Min" },
+            { icon: "AlertTriangle", value: "120", label: "Dopplungen" },
+            { icon: "Code", value: "931", label: "LOC" },
+            { icon: "Clock", value: "~8", label: "Min" },
           ]}
           high={5}
           medium={8}
@@ -40,8 +40,8 @@ const Uebersicht = () => (
           title="Optimierungen"
           primaryValue="25"
           metrics={[
-            { value: "1183", label: "LOC" },
-            { value: "~44", label: "Min" },
+            { icon: "Code", value: "1183", label: "LOC" },
+            { icon: "Clock", value: "~44", label: "Min" },
           ]}
           high={7}
           medium={12}

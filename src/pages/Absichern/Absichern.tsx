@@ -1,10 +1,11 @@
 import { useState } from "react";
 import Layout from "@/layout";
 import components from "@/components";
+import data from "@/data";
 
-type Severity = "kritisch" | "hoch" | "mittel" | "niedrig";
 
 type CweData = { id: string; description: string; time: string; open: number; done: number; total: number; highlighted?: boolean };
+type Severity = "kritisch" | "hoch" | "mittel" | "niedrig";
 type CodeData = {
   fileTitle: string;
   lineRange: string;
@@ -145,6 +146,8 @@ const Absichern = ({ severity }: { severity: Severity }) => {
       {data ? (
         <div className="mx-auto max-w-300 px-8 space-y-5 py-6">
           {/* Tab-Leiste (Severity-farbig) */}
+  
+
           <div className="flex gap-3 border-b border-border-1">
             {data.tabs.map((t) => {
               const isActive = active === t;
