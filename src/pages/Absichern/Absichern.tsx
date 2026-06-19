@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Layout from "@/layout";
 import components from "@/components";
-import data from "@/data";
 
 
 type CweData = { id: string; description: string; time: string; open: number; done: number; total: number; highlighted?: boolean };
