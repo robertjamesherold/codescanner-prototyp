@@ -1,7 +1,7 @@
 {
   "name": "CodeScanner",
   "short_name": "CodeScanner",
-  "description": "Portfolio & CodeScanner von Robert James Herold.",
+  "description": "CodeScanner von Robert James Herold.",
   "id": "/",
   "start_url": "/?source=pwa",
   "scope": "/",

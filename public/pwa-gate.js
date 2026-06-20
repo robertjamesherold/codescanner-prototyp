@@ -1,14 +1,18 @@
 /* PWA-Domain-Gate
    --------------------------------------------------------------------------
-   Die App ist NUR installierbar, wenn der Nutzer von einer erlaubten Domain
-   auf sie navigiert hat. Technisch heißt das: Manifest-Link und Service-Worker
-   werden ausschließlich dann eingebunden, wenn document.referrer zur erlaubten
-   Domain gehört. Ohne Manifest + Service Worker bietet der Browser keine
-   Installation an.
+   Die App ist NUR installierbar, wenn der Nutzer bewusst über den Installieren-
+   Link der Portfolio-Seite gekommen ist. Technisch heißt das: Manifest-Link und
+   Service-Worker werden ausschließlich dann eingebunden, wenn die Freigabe
+   vorliegt. Ohne Manifest + Service Worker bietet der Browser keine Installation.
+
+   Freigabe-Trigger (eines reicht):
+     1. ?install=1 in der URL → expliziter Installieren-Link vom Portfolio.
+        (Robust: der Referrer wird oft auf die Origin gekürzt oder ganz
+        entfernt, der URL-Parameter überlebt die Navigation dagegen sicher.)
+     2. document.referrer gehört zu einer erlaubten Domain (Fallback).
 
    Die Freigabe wird in sessionStorage gemerkt, damit sie über die Navigation
-   innerhalb der SPA hinweg erhalten bleibt (dort ist der Referrer dann die
-   App selbst).
+   innerhalb der SPA hinweg erhalten bleibt (dort sind Referrer/Parameter weg).
 */
 (function () {
   'use strict'
@@ -18,6 +22,14 @@
   // kann hier nicht auf "/codescanner" eingeschränkt werden.
   var ALLOWED_HOSTS = ['robertjamesherold.com', 'www.robertjamesherold.com']
   var GRANT_KEY = 'pwa-install-granted'
+
+  function installParamPresent() {
+    try {
+      return new URL(window.location.href).searchParams.get('install') === '1'
+    } catch (e) {
+      return false
+    }
+  }
 
   function refererAllowed() {
     try {
@@ -35,8 +47,9 @@
     granted = sessionStorage.getItem(GRANT_KEY) === '1'
   } catch (e) {}
 
-  // Frische Navigation von erlaubter Domain → Freigabe setzen.
-  if (!granted && refererAllowed()) {
+  // Frischer Installieren-Aufruf (?install=1) oder Navigation von erlaubter
+  // Domain → Freigabe setzen.
+  if (!granted && (installParamPresent() || refererAllowed())) {
     granted = true
     try {
       sessionStorage.setItem(GRANT_KEY, '1')
