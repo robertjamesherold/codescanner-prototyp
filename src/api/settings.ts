@@ -1,5 +1,6 @@
 /* Einstellungen (Nutzerdaten + Anbieter + API-Keys). Keys werden beim Laden nie
    zurückgegeben — nur `hasAnthropicKey`/`hasOpenaiKey` zeigen, ob einer existiert. */
+import { authHeaders } from './auth'
 
 export type Provider = "anthropic" | "openai";
 
@@ -36,7 +37,7 @@ const DEFAULT: Settings = {
 
 export const loadSettings = async (): Promise<Settings> => {
   try {
-    const res = await fetch("/api/settings");
+    const res = await fetch("/api/settings", { headers: authHeaders() });
     if (res.ok) return { ...DEFAULT, ...((await res.json()) as Partial<Settings>) };
   } catch {
     /* Backend nicht erreichbar */
@@ -49,7 +50,7 @@ export const saveSettings = async (
 ): Promise<{ ok: boolean; hasAnthropicKey: boolean; hasOpenaiKey: boolean }> => {
   const res = await fetch("/api/settings", {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(input),
   });
   if (!res.ok) throw new Error("Speichern fehlgeschlagen.");

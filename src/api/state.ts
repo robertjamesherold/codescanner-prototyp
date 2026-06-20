@@ -5,6 +5,7 @@
    ========================================================================== */
 
 import type { CleanupAccordion } from "@/data/cleanupTypes";
+import { authHeaders } from './auth'
 
 /** Ein importiertes Projekt mit eigenen Befunden und Anwenden-Zustand. */
 export type Project = {
@@ -74,7 +75,7 @@ const cacheLocal = (state: AppState): void => {
 /** Zustand laden: Backend zuerst, sonst localStorage, sonst Default. */
 export const loadState = async (): Promise<AppState> => {
   try {
-    const res = await fetch("/api/state");
+    const res = await fetch("/api/state", { headers: authHeaders() });
     if (res.ok) {
       const state = normalize(await res.json());
       cacheLocal(state);
@@ -98,7 +99,7 @@ export const saveState = async (state: AppState): Promise<void> => {
   try {
     await fetch("/api/state", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(state),
     });
   } catch {

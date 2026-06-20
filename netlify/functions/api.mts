@@ -3,6 +3,10 @@
    Bedient /api/* (via Redirect in netlify.toml) mit derselben Logik wie die
    Vite-Dev-Middleware (server/core.ts) — hier persistiert über Netlify Blobs
    (serverloser Key-Value-Store, ohne Extra-Hosting).
+
+   Zugangsschutz: Wenn die Env-Variable API_SECRET gesetzt ist, muss jeder
+   Request den Header "Authorization: Bearer <secret>" mitschicken. Ohne
+   gültiges Token antwortet die Function mit 401.
    ========================================================================== */
 import { getStore } from '@netlify/blobs'
 import { handleApi, type Store } from '../../server/core'
@@ -29,6 +33,24 @@ const apiPath = (rawUrl: string): string => {
 }
 
 export default async (req: Request): Promise<Response> => {
+  // OPTIONS (CORS-Preflight) benötigt keinen Auth-Check.
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204 })
+  }
+
+  // Zugangscode-Prüfung: Wenn API_SECRET in den Netlify-Umgebungsvariablen
+  // gesetzt ist, muss der Request das korrekte Bearer-Token mitschicken.
+  const secret = process.env.API_SECRET
+  if (secret) {
+    const auth = req.headers.get('authorization') ?? ''
+    if (auth !== `Bearer ${secret}`) {
+      return new Response(JSON.stringify({ ok: false, error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'content-type': 'application/json' },
+      })
+    }
+  }
+
   const method = req.method ?? 'GET'
   const rawBody = method === 'GET' || method === 'HEAD' ? '' : await req.text()
 

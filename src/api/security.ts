@@ -5,6 +5,8 @@
    Daten leben serverseitig in server/core.ts (DEFAULT_SECURITY).
    ========================================================================== */
 
+import { authHeaders } from './auth'
+
 export type Severity = "kritisch" | "hoch" | "mittel" | "niedrig";
 
 export type CweCardData = {
@@ -70,7 +72,7 @@ const normalize = (raw: unknown): Security => {
 /** Sicherheits-Befunde laden: Backend zuerst, sonst leer. */
 export const loadSecurity = async (): Promise<Security> => {
   try {
-    const res = await fetch("/api/security");
+    const res = await fetch("/api/security", { headers: authHeaders() });
     if (res.ok) return normalize(await res.json());
   } catch {
     /* Backend nicht erreichbar → leer */

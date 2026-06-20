@@ -1,4 +1,5 @@
 import type { CleanupAccordion } from "@/data/cleanupTypes";
+import { authHeaders } from './auth'
 
 /* Projektanalyse über das Backend (/api/analyze → Claude API). */
 
@@ -17,7 +18,7 @@ type AnalyzeResponse = {
 export const analyzeProject = async (files: AnalyzeFile[]): Promise<CleanupAccordion[]> => {
   const res = await fetch("/api/analyze", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ files }),
   });
 

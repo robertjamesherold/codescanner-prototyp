@@ -3,6 +3,7 @@ import Layout from "@/layout";
 import components from "@/components";
 import Icon from "@/assets/icons";
 import { loadSettings, saveSettings, type Provider } from "@/api/settings";
+import { getToken, setToken } from "@/api/auth";
 import { themeStore, type ThemePreference } from "@/theme/theme";
 
 const THEME_OPTIONS: { id: ThemePreference; label: string }[] = [
@@ -81,6 +82,8 @@ const Settings = () => {
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [hasAnthropicKey, setHasAnthropicKey] = useState(false);
   const [hasOpenaiKey, setHasOpenaiKey] = useState(false);
+  const [accessToken, setAccessToken] = useState("");
+  const [hasToken, setHasToken] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const themePref = useSyncExternalStore(
     themeStore.subscribe,
@@ -89,6 +92,8 @@ const Settings = () => {
   );
 
   useEffect(() => {
+    const token = getToken();
+    setHasToken(Boolean(token));
     void loadSettings().then((s) => {
       setName(s.name);
       setEmail(s.email);
@@ -103,6 +108,12 @@ const Settings = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("saving");
+    // Zugangscode wird nur lokal gespeichert — nie ans Backend geschickt.
+    if (accessToken) {
+      setToken(accessToken);
+      setHasToken(true);
+      setAccessToken("");
+    }
     try {
       const res = await saveSettings({
         name,
@@ -178,6 +189,21 @@ const Settings = () => {
                 })}
               </div>
             </Field>
+          </section>
+
+          {/* Zugangscode */}
+          <section className="flex flex-col gap-5 rounded-md border border-border-2 bg-grouped-1 p-6 shadow-md [--surface:var(--grouped-1)]">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-xl font-bold leading-6 font-display text-text-1">Zugangscode</h2>
+              <span className="body text-text-3">Schützt das Backend vor fremden Zugriffen. Muss mit dem <code className="rounded bg-bg-2 px-1 py-0.5 text-sm">API_SECRET</code> in den Netlify-Umgebungsvariablen übereinstimmen.</span>
+            </div>
+            <KeyField
+              label="Zugangscode"
+              has={hasToken}
+              value={accessToken}
+              onChange={setAccessToken}
+              placeholder="Dein geheimes Passwort"
+            />
           </section>
 
           {/* KI-Zugang */}

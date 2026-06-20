@@ -49,6 +49,8 @@ export type Overview = {
   };
 };
 
+import { authHeaders } from './auth'
+
 export const DEFAULT_OVERVIEW: Overview = {
   security: { critical: 8 },
   optimization: { open: 25, loc: 1183, minutes: 44, high: 7, medium: 12, low: 5 },
@@ -112,7 +114,7 @@ const normalize = (raw: unknown): Overview => {
 /** Übersichts-Kennzahlen laden: Backend zuerst, sonst Default. */
 export const loadOverview = async (): Promise<Overview> => {
   try {
-    const res = await fetch("/api/overview");
+    const res = await fetch("/api/overview", { headers: authHeaders() });
     if (res.ok) return normalize(await res.json());
   } catch {
     /* Backend nicht erreichbar → Default */
@@ -125,7 +127,7 @@ export const saveOverview = async (overview: Overview): Promise<void> => {
   try {
     await fetch("/api/overview", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(overview),
     });
   } catch {
