@@ -22,8 +22,84 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&family=Azeret+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- Mindest-Fenstergröße der installierten App: 1280 × 780.
+         Web-Apps können das OS-Fenster nicht hart begrenzen, daher:
+         a) best-effort Auto-Resize auf die äußere Fenstergröße,
+         b) Blockier-Overlay, falls der Browser das Resizing verweigert.
+         Steuerung erfolgt per JS (siehe Script unten), gemessen an
+         window.outerWidth / outerHeight, nur im installierten Zustand. -->
+    <style>
+      #min-size-gate { display: none; }
+      html.min-size-block #min-size-gate {
+        display: flex;
+        position: fixed; inset: 0; z-index: 2147483647;
+        align-items: center; justify-content: center;
+        padding: 24px; text-align: center;
+        background: #0C111A; color: #fff;
+        font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+      }
+      html.min-size-block #root { display: none; }
+      #min-size-gate .msg { max-width: 440px; }
+      #min-size-gate strong { display: block; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+      #min-size-gate p { font-size: 15px; line-height: 1.55; opacity: 0.75; margin: 0; }
+    </style>
   </head>
   <body>
+    <div id="min-size-gate" role="alertdialog" aria-modal="true" aria-label="Fenster zu klein">
+      <div class="msg">
+        <strong>Fenster zu klein</strong>
+        <p>Bitte vergrößere das Fenster auf mindestens 1280&nbsp;×&nbsp;780&nbsp;Pixel, um den CodeScanner zu nutzen.</p>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var MIN_W = 1280, MIN_H = 780;
+
+        function installed() {
+          return window.matchMedia('(display-mode: standalone)').matches ||
+                 window.matchMedia('(display-mode: minimal-ui)').matches ||
+                 window.navigator.standalone === true;
+        }
+
+        function tooSmall() {
+          return window.outerWidth < MIN_W || window.outerHeight < MIN_H;
+        }
+
+        function setBlocked(b) {
+          document.documentElement.classList.toggle('min-size-block', b);
+        }
+
+        function evaluate() {
+          // Im Browser-Tab / iframe nie blockieren.
+          if (!installed()) { setBlocked(false); return; }
+
+          if (tooSmall()) {
+            // Best-effort: Fenster auf Mindestgröße zurückschnappen.
+            try {
+              window.resizeTo(
+                Math.max(window.outerWidth, MIN_W),
+                Math.max(window.outerHeight, MIN_H)
+              );
+            } catch (e) { /* vom Browser blockiert */ }
+          }
+
+          // Nach dem Resize-Versuch erneut messen und Overlay setzen.
+          setTimeout(function () { setBlocked(tooSmall()); }, 60);
+        }
+
+        var t;
+        function schedule() { clearTimeout(t); t = setTimeout(evaluate, 120); }
+
+        window.addEventListener('resize', schedule);
+        window.addEventListener('load', evaluate);
+        // Display-Mode-Wechsel (Installieren / Deinstallieren) erneut prüfen.
+        window.matchMedia('(display-mode: standalone)').addEventListener('change', evaluate);
+        evaluate();
+      })();
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
