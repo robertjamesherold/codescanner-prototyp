@@ -1,8 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Layout from "@/layout";
 import components from "@/components";
 import Icon from "@/assets/icons";
 import { loadSettings, saveSettings, type Provider } from "@/api/settings";
+import { themeStore, type ThemePreference } from "@/theme/theme";
+
+const THEME_OPTIONS: { id: ThemePreference; label: string }[] = [
+  { id: "light", label: "Hell" },
+  { id: "dark", label: "Dunkel" },
+  { id: "system", label: "System" },
+];
 
 const ANTHROPIC_MODELS = [
   { id: "claude-opus-4-8", label: "Claude Opus 4.8 (genau)" },
@@ -75,6 +82,11 @@ const Settings = () => {
   const [hasAnthropicKey, setHasAnthropicKey] = useState(false);
   const [hasOpenaiKey, setHasOpenaiKey] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const themePref = useSyncExternalStore(
+    themeStore.subscribe,
+    themeStore.getPreference,
+    themeStore.getPreference,
+  );
 
   useEffect(() => {
     void loadSettings().then((s) => {
@@ -136,6 +148,35 @@ const Settings = () => {
             </Field>
             <Field label="E-Mail">
               <input className={inputClass} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="du@beispiel.de" />
+            </Field>
+          </section>
+
+          {/* Darstellung */}
+          <section className="flex flex-col gap-5 rounded-md border border-border-2 bg-grouped-1 p-6 shadow-md [--surface:var(--grouped-1)]">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-xl font-bold leading-6 font-display text-text-1">Darstellung</h2>
+              <span className="body text-text-3">Hell, dunkel oder dem System folgen.</span>
+            </div>
+            <Field label="Modus" hint="„System“ folgt der Einstellung deines Geräts.">
+              <div className="flex gap-2">
+                {THEME_OPTIONS.map((t) => {
+                  const active = themePref === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => themeStore.setPreference(t.id)}
+                      className={`flex-1 rounded-md border px-4 py-2 text-base cursor-pointer transition-colors ${
+                        active
+                          ? "border-primary bg-primary/10 text-text-1"
+                          : "border-border-1 bg-bg-1 text-text-3 hover:text-text-2"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
             </Field>
           </section>
 

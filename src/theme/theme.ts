@@ -40,6 +40,17 @@ let isDark: boolean = preference === 'system' ? systemPrefersDark() : preference
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 
+/** Browser-/OS-Leistenfarbe je Mode (deckt sich mit --bg-1 in tokens.css). */
+const DARK_THEME_COLOR = '#0C111A';
+const LIGHT_THEME_COLOR = '#FFFFFF';
+
+/** <meta name="theme-color"> an den aktiven Mode angleichen. */
+const applyMetaThemeColor = () => {
+  if (typeof document === 'undefined') return;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', isDark ? DARK_THEME_COLOR : LIGHT_THEME_COLOR);
+};
+
 /** Reflect the current preference onto <html> (or clear it for 'system'). */
 const applyToDocument = () => {
   if (typeof document === 'undefined') return;
@@ -62,6 +73,7 @@ const setPreference = (next: ThemePreference) => {
   }
   applyToDocument();
   recompute();
+  applyMetaThemeColor();
   emit();
 };
 
@@ -75,12 +87,14 @@ if (typeof window !== 'undefined') {
     .addEventListener('change', () => {
       if (preference !== 'system') return;
       recompute();
+      applyMetaThemeColor();
       emit();
     });
 
   // Make sure the attribute matches the stored preference even if the inline
   // bootstrap in index.html didn't run.
   applyToDocument();
+  applyMetaThemeColor();
 }
 
 export const themeStore = {

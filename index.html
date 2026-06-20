@@ -7,6 +7,38 @@
 
     <!-- PWA: Theme & iOS -->
     <meta name="theme-color" content="#0C111A" />
+
+    <!-- Theme-Bootstrap (vor dem ersten Paint, verhindert Flash):
+         1. ?theme=dark|light|system aus der URL übernehmen (so kann die
+            Portfolio-Seite den aktuellen Mode beim Klick mitgeben) und in
+            localStorage persistieren.
+         2. Gespeicherte Präferenz (oder System) auf <html data-theme> anwenden.
+         3. <meta theme-color> passend setzen, damit auch die Browser-/OS-Leiste
+            zum Mode passt. tokens.css und src/theme/theme.ts übernehmen danach. -->
+    <script>
+      (function () {
+        try {
+          var KEY = 'theme';
+          var q = new URL(window.location.href).searchParams.get('theme');
+          if (q === 'dark' || q === 'light') localStorage.setItem(KEY, q);
+          else if (q === 'system') localStorage.removeItem(KEY);
+
+          var saved = localStorage.getItem(KEY);
+          var pref = saved === 'dark' || saved === 'light' ? saved : 'system';
+          var dark = pref === 'system'
+            ? window.matchMedia('(prefers-color-scheme: dark)').matches
+            : pref === 'dark';
+
+          var el = document.documentElement;
+          if (pref === 'system') el.removeAttribute('data-theme');
+          else el.setAttribute('data-theme', pref);
+
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', dark ? '#0C111A' : '#FFFFFF');
+        } catch (e) { /* localStorage/URL nicht verfügbar → Defaults greifen */ }
+      })();
+    </script>
+
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="RJH Portfolio" />
@@ -43,6 +75,24 @@
       #min-size-gate .msg { max-width: 440px; }
       #min-size-gate strong { display: block; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
       #min-size-gate p { font-size: 15px; line-height: 1.55; opacity: 0.75; margin: 0; }
+
+      /* Feste Design-Bühne 1440 × 1000. Bei kleinerem Viewport wird die ganze
+         App uniform heruntergerechnet (statt responsiv umzubrechen). Bei
+         ≥ 1440 × 1000 bleibt das normale, fluide Verhalten (Klasse fehlt dann).
+         Diese Regeln sind bewusst unlayered → sie schlagen die Tailwind-Utilities
+         w-screen / h-screen ohne !important. --app-scale kommt aus dem Script. */
+      html.app-scaled,
+      html.app-scaled body { overflow: hidden; }
+      html.app-scaled #root {
+        position: fixed;
+        top: 50%; left: 50%;
+        width: 1440px; height: 1000px;
+        transform: translate(-50%, -50%) scale(var(--app-scale, 1));
+        transform-origin: center center;
+      }
+      /* App-Rahmen füllt die feste Bühne statt des echten Viewports. */
+      html.app-scaled .w-screen { width: 100%; }
+      html.app-scaled .h-screen { height: 100%; }
     </style>
   </head>
   <body>
@@ -97,6 +147,30 @@
         // Display-Mode-Wechsel (Installieren / Deinstallieren) erneut prüfen.
         window.matchMedia('(display-mode: standalone)').addEventListener('change', evaluate);
         evaluate();
+      })();
+    </script>
+
+    <!-- Down-Scaling: App auf die feste Bühne 1440 × 1000 rechnen, sobald der
+         Viewport kleiner ist. Faktor = min(vw/1440, vh/1000), nie über 1. -->
+    <script>
+      (function () {
+        var BASE_W = 1440, BASE_H = 1000;
+        var el = document.documentElement;
+        function apply() {
+          var scale = Math.min(window.innerWidth / BASE_W, window.innerHeight / BASE_H);
+          if (scale < 1) {
+            el.style.setProperty('--app-scale', String(scale));
+            el.classList.add('app-scaled');
+          } else {
+            el.classList.remove('app-scaled');
+            el.style.removeProperty('--app-scale');
+          }
+        }
+        var t;
+        window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(apply, 80); });
+        window.addEventListener('orientationchange', apply);
+        window.addEventListener('load', apply);
+        apply();
       })();
     </script>
 
