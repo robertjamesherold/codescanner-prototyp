@@ -15,8 +15,8 @@ function App() {
       <Layout.Page >
         <Routes>
           {/* Standard-Routen → Sidebar v1 */}
-          <Route path="/home" element={<Home />} />
-          <Route path="/" element={<Navigate to="/home" />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Navigate to="/home" />} />
           <Route path="/recent" element={<Recent />} />
           <Route path="/einstellungen" element={<Settings />} />
           <Route path="/import" element={<Import />} />

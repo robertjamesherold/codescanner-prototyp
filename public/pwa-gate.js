@@ -13,8 +13,10 @@
 (function () {
   'use strict'
 
-  // Erlaubte Quell-Domains. Beliebig erweiterbar.
-  var ALLOWED_HOSTS = ['robertjamesherold.com/codescanner', 'www.robertjamesherold.com/codescanner']
+  // Erlaubte Quell-Domains (nur Hostnamen, ohne Pfad). Der Referrer liefert
+  // bei Cross-Origin-Navigation per Default nur die Origin ohne Pfad, daher
+  // kann hier nicht auf "/codescanner" eingeschränkt werden.
+  var ALLOWED_HOSTS = ['robertjamesherold.com', 'www.robertjamesherold.com']
   var GRANT_KEY = 'pwa-install-granted'
 
   function refererAllowed() {
