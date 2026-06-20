@@ -8,6 +8,9 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Feste rem-Basis: Schriftgrößen ignorieren die Browser-Standardschriftgröße.
+       (Browser-Zoom skaliert weiterhin alles, wie erwartet.) */
+    font-size: 16px;
     @apply bg-bg-1;
   }
 
