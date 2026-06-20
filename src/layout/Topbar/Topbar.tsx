@@ -279,7 +279,7 @@ const Topbar = ({
   } else if (variant === "optimieren") {
     actions = (
       <>
-        <Button color="success" variant="filled" label="6 Sicher optimieren" leftIcon="Check" onClick={handlePrimary} />
+        <Button color={primaryDone ? "success" : "primary"} variant="filled" label={primaryLabel ?? "Sicher optimieren"} leftIcon="CheckSquare" onClick={handlePrimary} disabled={primaryDisabled} className="min-w-fit" />
         <Button color="secondary" variant="outlined" label="Überspringen" onClick={handleSkip} />
       </>
     );

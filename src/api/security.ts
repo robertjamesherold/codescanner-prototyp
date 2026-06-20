@@ -1,35 +1,25 @@
-/* ============================================================================
-   Persistenz-Client für die Sicherheits-Befunde (Absichern-Seite).
-   Primär gegen das Mini-Backend (/api/security); fällt offline auf einen LEEREN
-   Datensatz zurück (→ Empty-State statt veralteter Demo). Die Demo-/Default-
-   Daten leben serverseitig in server/core.ts (DEFAULT_SECURITY).
-   ========================================================================== */
-
 import { authHeaders } from './auth'
 
 export type Severity = "kritisch" | "hoch" | "mittel" | "niedrig";
 
-export type CweCardData = {
+export type SecurityFinding = {
   id: string;
-  description: string;
-  time: string;
-  open: number;
-  done: number;
-  total: number;
-  highlighted?: boolean;
-};
-
-export type SecurityCode = {
   fileTitle: string;
   lineRange: string;
-  fileIndex: number;
-  fileTotal: number;
   description: string;
   before: string;
   after: string;
 };
 
-export type SeverityData = { cards: CweCardData[]; code?: SecurityCode };
+export type CweCardData = {
+  id: string;
+  description: string;
+  time: string;
+  findings: SecurityFinding[];
+  highlighted?: boolean;
+};
+
+export type SeverityData = { cards: CweCardData[] };
 export type Security = Record<Severity, SeverityData>;
 
 const SEVERITIES: Severity[] = ["kritisch", "hoch", "mittel", "niedrig"];
@@ -41,7 +31,17 @@ export const EMPTY_SECURITY: Security = {
   niedrig: { cards: [] },
 };
 
-const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
+const normalizeFinding = (raw: unknown): SecurityFinding => {
+  const f = (raw ?? {}) as Partial<SecurityFinding>;
+  return {
+    id: String(f.id ?? ""),
+    fileTitle: String(f.fileTitle ?? ""),
+    lineRange: String(f.lineRange ?? ""),
+    description: String(f.description ?? ""),
+    before: String(f.before ?? ""),
+    after: String(f.after ?? ""),
+  };
+};
 
 const normalizeCard = (raw: unknown): CweCardData => {
   const c = (raw ?? {}) as Partial<CweCardData>;
@@ -49,10 +49,10 @@ const normalizeCard = (raw: unknown): CweCardData => {
     id: String(c.id ?? ""),
     description: String(c.description ?? ""),
     time: String(c.time ?? "~0"),
-    open: num(c.open),
-    done: num(c.done),
-    total: num(c.total),
     highlighted: Boolean(c.highlighted),
+    findings: Array.isArray(c.findings)
+      ? c.findings.map(normalizeFinding).filter((f) => f.id)
+      : [],
   };
 };
 
@@ -63,7 +63,6 @@ const normalize = (raw: unknown): Security => {
     const sd = (obj[sev] ?? {}) as Partial<SeverityData>;
     out[sev] = {
       cards: Array.isArray(sd.cards) ? sd.cards.map(normalizeCard).filter((c) => c.id) : [],
-      code: sd.code,
     };
   }
   return out;

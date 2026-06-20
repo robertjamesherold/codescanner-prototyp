@@ -4,21 +4,18 @@ import {
   loadSecurity,
   type CweCardData,
   type Security,
-  type SecurityCode,
+  type SecurityFinding,
   type Severity,
   type SeverityData,
 } from "@/api/security";
+import { useSecurityFixed } from "@/store/appState";
 
-export type { CweCardData, Security, SecurityCode, Severity, SeverityData };
+export type { CweCardData, Security, SecurityFinding, Severity, SeverityData };
 
-/* ============================================================================
-   Sicherheits-Hook (Absichern): lädt die Befunde einmalig vom Backend.
-   `ready` unterscheidet "lädt noch" von "wirklich nichts gefunden", damit die
-   Seite nicht kurz fälschlich den Empty-State zeigt.
-   ========================================================================== */
-export const useSecurity = (): { security: Security; ready: boolean } => {
+export const useSecurity = () => {
   const [security, setSecurity] = useState<Security>(EMPTY_SECURITY);
   const [ready, setReady] = useState(false);
+  const { securityFixed, mark: markFixed, unmark: unmarkFixed } = useSecurityFixed();
 
   useEffect(() => {
     let alive = true;
@@ -32,5 +29,5 @@ export const useSecurity = (): { security: Security; ready: boolean } => {
     };
   }, []);
 
-  return { security, ready };
+  return { security, ready, securityFixed, markFixed, unmarkFixed };
 };

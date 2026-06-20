@@ -24,10 +24,14 @@ export type AppState = {
   activeProjectId: string | null;
   /** Anwenden-Zustand der Demo-Daten (wenn kein Projekt aktiv ist). */
   demoApplied: string[];
+  /** IDs der als gefixt markierten Sicherheits-Befunde. */
+  securityFixed: string[];
+  /** IDs der als angewendet markierten Optimierungs-Befunde. */
+  optimizeApplied: string[];
   projects: Project[];
 };
 
-export const DEFAULT_STATE: AppState = { activeProjectId: null, demoApplied: [], projects: [] };
+export const DEFAULT_STATE: AppState = { activeProjectId: null, demoApplied: [], securityFixed: [], optimizeApplied: [], projects: [] };
 
 const LS_KEY = "codescanner:state";
 
@@ -57,11 +61,13 @@ const normalize = (raw: unknown): AppState => {
     : Array.isArray(obj.cleanup?.applied)
       ? obj.cleanup!.applied.map(String)
       : [];
+  const securityFixed = Array.isArray(obj.securityFixed) ? obj.securityFixed.map(String) : [];
+  const optimizeApplied = Array.isArray(obj.optimizeApplied) ? obj.optimizeApplied.map(String) : [];
   const activeProjectId =
     typeof obj.activeProjectId === "string" && projects.some((p) => p.id === obj.activeProjectId)
       ? obj.activeProjectId
       : null;
-  return { activeProjectId, demoApplied, projects };
+  return { activeProjectId, demoApplied, securityFixed, optimizeApplied, projects };
 };
 
 const cacheLocal = (state: AppState): void => {

@@ -127,6 +127,47 @@ export const addAnalysisToProject = (
     ),
   }));
 
+/** Optimierungs-Befunde: IDs der als angewendet markierten Findings + Mutatoren. */
+export const useOptimizeApplied = () => {
+  const { state: snapshot } = useAppState();
+  return {
+    optimizeApplied: snapshot.optimizeApplied,
+    mark: (id: string) =>
+      setState((prev) => ({
+        ...prev,
+        optimizeApplied: prev.optimizeApplied.includes(id) ? prev.optimizeApplied : [...prev.optimizeApplied, id],
+      })),
+    unmark: (id: string) =>
+      setState((prev) => ({
+        ...prev,
+        optimizeApplied: prev.optimizeApplied.filter((x) => x !== id),
+      })),
+    markMany: (ids: string[]) =>
+      setState((prev) => ({
+        ...prev,
+        optimizeApplied: Array.from(new Set([...prev.optimizeApplied, ...ids])),
+      })),
+  };
+};
+
+/** Sicherheits-Befunde: IDs der als gefixt markierten Findings + Mutatoren. */
+export const useSecurityFixed = () => {
+  const { state: snapshot } = useAppState();
+  return {
+    securityFixed: snapshot.securityFixed,
+    mark: (id: string) =>
+      setState((prev) => ({
+        ...prev,
+        securityFixed: prev.securityFixed.includes(id) ? prev.securityFixed : [...prev.securityFixed, id],
+      })),
+    unmark: (id: string) =>
+      setState((prev) => ({
+        ...prev,
+        securityFixed: prev.securityFixed.filter((x) => x !== id),
+      })),
+  };
+};
+
 /**
  * Bereinigen-spezifischer Zugriff: angewendete Befund-IDs (aktiver Kontext) + Mutatoren.
  * Jede Mutation persistiert automatisch über den Store.

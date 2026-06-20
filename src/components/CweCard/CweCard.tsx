@@ -52,11 +52,12 @@ const CweCard = ({
   onAction,
 }: CweCardProps) => {
   const accent = SEVERITY_COLOR[severity];
+  const allDone = total > 0 && done >= total;
 
   return (
     <div
       data-layer="CweCard"
-      className="flex w-full flex-col gap-4 rounded-md border bg-grouped-1 p-5 shadow-md"
+      className={`flex w-full flex-col gap-4 rounded-md border bg-grouped-1 p-5 shadow-md transition-opacity duration-300 ${allDone ? "opacity-50" : ""}`}
       style={{ borderColor: highlighted ? accent : "var(--border-2)" }}
     >
       {/* Kopf */}
@@ -76,12 +77,12 @@ const CweCard = ({
           </div>
 
           <div className="flex h-4 items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Icon name="AlertTriangle" size={14} strokeWidth={2} className="text-text-1" />
-              <span className="text-sm text-text-1 truncate w-36">{description}</span>
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <Icon name="AlertTriangle" size={14} strokeWidth={2} className="text-text-1 shrink-0" />
+              <span className="text-sm text-text-1 truncate">{description}</span>
             </div>
-            <span aria-hidden className="h-full w-px bg-border-2" />
-            <div className="flex items-center gap-2">
+            <span aria-hidden className="h-full w-px shrink-0 bg-border-2" />
+            <div className="flex shrink-0 items-center gap-2">
               <Icon name="Clock" size={14} strokeWidth={2} className="text-text-1" />
               <span className="text-sm text-text-1">{time}</span>
               <span className="text-sm text-text-3">{timeUnit}</span>

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /* ============================================================================
    Produktions-Backend als Netlify Function.
    Bedient /api/* (via Redirect in netlify.toml) mit derselben Logik wie die

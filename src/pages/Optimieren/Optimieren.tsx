@@ -1,58 +1,193 @@
-import { useState } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import Layout from "@/layout";
 import components from "@/components";
-import data from "@/data";
+import { useOptimize, type OptimizeCategory } from "@/data/optimize";
+import type { SecurityFinding } from "@/api/security";
 
+const CATEGORY_ICONS: Record<string, Parameters<typeof components.StatCard>[0]["icon"]> = {
+  bundle: "Package",
+  performance: "Zap",
+  architektur: "Layers",
+  api: "Send",
+};
 
-const OPTIMIERUNG_CODE = `type SettingsPayload = {
-  language: 'de' | 'en';
-  theme: 'light' | 'dark';
-  notifications: boolean;
-};`;
-
-/** Seite "Optimieren" (/optimieren) — Tabs + Stat-Karten + Code-Karte (gemäß Figma). */
+/** Seite "Optimieren" (/optimieren) — Tabs + Stat-Karten + Code-Karte. */
 const Optimieren = () => {
   const [active, setActive] = useState("Alle");
-  
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const {
+    categories,
+    applied,
+    mark,
+    markMany,
+    totals,
+    statsFor,
+    categoryDone,
+    safeIds,
+    safeCount,
+    totalLow,
+  } = useOptimize();
+
+  // Nur Kategorien mit noch vorhandenen Findings zeigen.
+  const foundCategories = categories.filter((c) => c.findings.length > 0);
+  const categoriesWithOpen = new Set(
+    foundCategories.filter((c) => !categoryDone(c)).map((c) => c.id)
+  );
+
+  const tabList = ["Alle", ...foundCategories.map((c) => c.title)];
+  const effectiveActive = tabList.includes(active) ? active : "Alle";
+
+  const visibleCategories = foundCategories.filter(
+    (c) => effectiveActive === "Alle" || c.title === effectiveActive
+  );
+
+  // Aktive Kategorie für die CodeCard.
+  const activeCategory =
+    effectiveActive !== "Alle"
+      ? foundCategories.find((c) => c.title === effectiveActive)
+      : (foundCategories.find((c) => categoriesWithOpen.has(c.id)) ?? foundCategories[0]);
+
+  // Erledigte Kategorien ans Ende sortieren.
+  const orderedCategories = [...visibleCategories].sort(
+    (a, b) => Number(categoryDone(a)) - Number(categoryDone(b))
+  );
+
+  // FLIP-Animation
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const prevTops = useRef<Map<string, number>>(new Map());
+
+  useLayoutEffect(() => {
+    const newTops = new Map<string, number>();
+    cardRefs.current.forEach((el, key) => newTops.set(key, el.getBoundingClientRect().top));
+    newTops.forEach((newTop, key) => {
+      const oldTop = prevTops.current.get(key);
+      const el = cardRefs.current.get(key);
+      if (oldTop === undefined || !el || oldTop === newTop) return;
+      el.style.transition = "none";
+      el.style.transform = `translateY(${oldTop - newTop}px)`;
+      requestAnimationFrame(() => {
+        el.style.transition = "transform 350ms cubic-bezier(0.22, 1, 0.36, 1)";
+        el.style.transform = "";
+      });
+    });
+    prevTops.current.clear();
+    newTops.forEach((v, k) => prevTops.current.set(k, v));
+  });
+
+  // Findings der aktiven Kategorie als SecurityFinding-Shape für CodeCard.
+  const codeFindings: SecurityFinding[] = (activeCategory?.findings ?? []).map((f) => ({
+    id: f.id,
+    fileTitle: f.fileTitle,
+    lineRange: f.lineRange,
+    description: f.description,
+    before: f.before,
+    after: f.after,
+  }));
 
   return (
-    <Layout.Content
-      topbar={<Layout.Topbar variant="optimieren" />}
-      bottombar={<Layout.Bottombar variant="optimieren" />}
-    >
-      <div className="mx-auto max-w-300 px-8  space-y-5 py-6">
-        {/* Tab-Leiste (performance-farbig) */}
-        {/* data.tabs is a keyed object; use the first entry to match Tabbar's expected shape */}
-        <components.Tabbar active={active} setActive={setActive} tabs={Object.values(data.tabs)[5]} />
+    <>
+      <Layout.Content
+        topbar={
+          <Layout.Topbar
+            variant="optimieren"
+            info={[
+              { icon: "Sparkles", value: String(totals.open), label: "Optimierungen" },
+              { icon: "Code", value: String(totals.loc), label: "LOC" },
+              { icon: "Clock", value: `~${totals.minutes}`, label: "Min" },
+            ]}
+            primaryLabel={safeCount === 0 ? `${totalLow} Sicher optimiert` : `${safeCount} Sicher optimieren`}
+            primaryDisabled={safeCount === 0}
+            primaryDone={safeCount === 0}
+            onPrimaryAction={() => setConfirmOpen(true)}
+          />
+        }
+        bottombar={<Layout.Bottombar variant="optimieren" />}
+      >
+        <div className="mx-auto max-w-300 px-8 space-y-5 py-6">
+          <components.Tabbar
+            active={effectiveActive}
+            setActive={setActive}
+            tabs={{ Name: "Optimieren", Tabs: tabList }}
+          />
 
-        {/* Grid: links Stat-Karten, rechts Code-Karte */}
-        <div className="grid grid-cols-6 gap-5">
-          <div className="col-span-2 flex flex-col gap-4">
-            <components.StatCard icon="Package" color="performance" title="Bundle" primaryValue="5"
-              metrics={[{ icon: "Code", value: "98", label: "LOC" }, { icon: "Clock", value: "~10", label: "Min" }]} high={1} medium={3} low={1} highlighted />
-            <components.StatCard icon="Zap" color="performance" title="Performance" primaryValue="7"
-              metrics={[{ icon: "Code", value: "328", label: "LOC" }, { icon: "Clock", value: "~8", label: "Min" }]} high={1} medium={3} low={3} />
-            <components.StatCard icon="Layers" color="performance" title="Architektur" primaryValue="5"
-              metrics={[{ icon: "Code", value: "189", label: "LOC" }, { icon: "Clock", value: "~15", label: "Min" }]} high={1} medium={3} low={1} />
-            <components.StatCard icon="Send" color="performance" title="API-Effizienz" primaryValue="8"
-              metrics={[{ icon: "Code", value: "156", label: "LOC" }, { icon: "Clock", value: "~11", label: "Min" }]} high={3} medium={3} low={2} />
-          </div>
+          {foundCategories.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 rounded-md border border-border-2 bg-grouped-1 px-8 py-16 text-center shadow-md">
+              <span className="cardtitle text-text-1">Keine Optimierungen</span>
+              <span className="body text-text-3">Für dieses Projekt wurden keine Optimierungen gefunden.</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-6 gap-5">
+              {/* Stat-Karten */}
+              <div className="col-span-2 flex flex-col gap-4">
+                {orderedCategories.map((c) => {
+                  const st = statsFor(c.id);
+                  return (
+                    <div
+                      key={c.id}
+                      ref={(el) => { if (el) cardRefs.current.set(c.id, el); else cardRefs.current.delete(c.id); }}
+                    >
+                      <components.StatCard
+                        icon={CATEGORY_ICONS[c.id] ?? "Sparkles"}
+                        color="performance"
+                        title={c.title}
+                        primaryValue={String(st.open)}
+                        metrics={[
+                          { icon: "Code", value: String(st.loc), label: "LOC" },
+                          { icon: "Clock", value: `~${st.minutes}`, label: "Min" },
+                        ]}
+                        high={st.high}
+                        medium={st.medium}
+                        low={st.low}
+                        highlighted={effectiveActive !== "Alle" && effectiveActive === c.title}
+                        onClick={() => setActive(c.title)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
 
-          <div className="col-span-4">
-            <components.CodeCard
-              accent="var(--performance)"
-              icon="TrendingUp"
-              fileTitle="Datei 1: utils.js"
-              lineRange="Zeile 35-50"
-              fileIndex={1}
-              fileTotal={5}
-              description="Die Benutzereingaben werden ohne ausreichende Validierung übernommen. Dadurch können fehlerhafte, unerwartete oder manipulierte Werte in die Anwendung gelangen."
-              after={{ label: "Optimierung:", tone: "info", code: OPTIMIERUNG_CODE }}
+              {/* Code-Karte */}
+              {activeCategory && codeFindings.length > 0 && (
+                <div className="col-span-4">
+                  <components.CodeCard
+                    key={activeCategory.id}
+                    accent="var(--performance)"
+                    icon="TrendingUp"
+                    findings={codeFindings}
+                    fixedIds={applied}
+                    onMarkFixed={mark}
+                    afterLabel="Optimiert:"
+                    actionLabel="Als optimiert markieren"
+                    actionDoneLabel="Optimiert ✓"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </Layout.Content>
+
+      {confirmOpen && (
+        <div
+          className="fixed inset-0 z-3000 flex items-center justify-center bg-black/30 backdrop-blur-sm p-8"
+          onClick={() => setConfirmOpen(false)}
+          role="presentation"
+        >
+          <div className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <components.Alert
+              title={`${safeCount} Optimierungen sicher anwenden?`}
+              description="Alle niedrig eingestuften Optimierungen werden automatisch angewendet. Einzelne Schritte kannst du danach rückgängig machen."
+              confirmColor="quality"
+              confirmLabel="Sicher optimieren"
+              cancelLabel="Abbrechen"
+              onConfirm={() => { markMany(safeIds); setConfirmOpen(false); }}
+              onCancel={() => setConfirmOpen(false)}
             />
           </div>
         </div>
-      </div>
-    </Layout.Content>
+      )}
+    </>
   );
 };
 

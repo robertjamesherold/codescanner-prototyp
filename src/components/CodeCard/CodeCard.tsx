@@ -2,43 +2,23 @@ import { useState, type ReactNode } from "react";
 import Icon from "@/assets/icons";
 import Button from "@/components/Button";
 import Link from "@/components/Link";
+import type { SecurityFinding } from "@/api/security";
 
 type IconName = Parameters<typeof Icon>[0]["name"];
-type Tone = "error" | "success" | "info";
-
-type CodeBlock = {
-  label: string;
-  tone?: Tone;
-  code: string;
-  startLine?: number;
-  copyable?: boolean;
-};
 
 type CodeCardProps = {
-  /** Akzent-Farbtoken (Fortschrittsbalken + Headline-Icon). */
   accent?: string;
   icon?: IconName;
-  fileTitle?: string;
-  lineRange?: string;
-  description?: string;
-  before?: CodeBlock;
-  after: CodeBlock;
-  fileIndex?: number;
-  fileTotal?: number;
-  onPrev?: () => void;
-  onMarkFixed?: () => void;
-  onNext?: () => void;
-};
-
-const TONE_VAR: Record<Tone, string> = {
-  error: "var(--error)",
-  success: "var(--success)",
-  info: "var(--info)",
+  findings: SecurityFinding[];
+  fixedIds?: Set<string>;
+  onMarkFixed?: (id: string) => void;
+  afterLabel?: string;
+  actionLabel?: string;
+  actionDoneLabel?: string;
 };
 
 /* ---------------------------------------------------------------------------
-   Leichtes JS/TS-Syntax-Highlighting (regex-basiert, ohne externe Dependency).
-   Farben kommen aus den --code-*-Tokens (passen sich an Light/Dark an).
+   JS/TS-Syntax-Highlighting (regex-basiert, ohne externe Dependency).
 --------------------------------------------------------------------------- */
 const KEYWORDS = new Set([
   "export", "import", "from", "default", "function", "const", "let", "var", "return", "if", "else",
@@ -68,10 +48,7 @@ const highlight = (code: string): ReactNode[] => {
   TOKENIZER.lastIndex = 0;
   while ((m = TOKENIZER.exec(code)) !== null) {
     const [full, comment, str, num, ident, ws] = m;
-    if (ws !== undefined) {
-      out.push(full);
-      continue;
-    }
+    if (ws !== undefined) { out.push(full); continue; }
     let color: string | undefined;
     if (comment !== undefined) color = CODE_COLOR.comment;
     else if (str !== undefined) color = CODE_COLOR.string;
@@ -82,25 +59,21 @@ const highlight = (code: string): ReactNode[] => {
       else color = /^\s*\(/.test(code.slice(m.index + ident.length)) ? CODE_COLOR.func : CODE_COLOR.ident;
     }
     if (color) out.push(<span key={key++} style={{ color }}>{full}</span>);
-    else out.push(full); // Interpunktion → erbt code-white
+    else out.push(full);
   }
   return out;
 };
 
-/** Code-Block mit Zeilennummern (Code als Monospace, ohne Token-Highlighting). */
-const Block = ({ block }: { block: CodeBlock }) => {
-  const lines = block.code.replace(/\n$/, "").split("\n");
-  const start = block.startLine ?? 1;
-  const copy = () => navigator.clipboard?.writeText(block.code);
-
+const CodeBlock = ({ label, tone, code, copyable }: { label: string; tone: "error" | "success"; code: string; copyable?: boolean }) => {
+  const lines = code.replace(/\n$/, "").split("\n");
+  const toneColor = tone === "error" ? "var(--error)" : "var(--success)";
   return (
     <div className="flex w-full flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-lg" style={{ color: TONE_VAR[block.tone ?? "success"] }}>
-          {block.label}
-        </span>
-        {block.copyable && (
-          <button type="button" onClick={copy} className="flex items-center gap-1 text-base text-text-3 cursor-pointer hover:text-text-2">
+        <span className="text-lg" style={{ color: toneColor }}>{label}</span>
+        {copyable && (
+          <button type="button" onClick={() => navigator.clipboard?.writeText(code)}
+            className="flex items-center gap-1 text-base text-text-3 cursor-pointer hover:text-text-2">
             <Icon name="Copy" size={16} strokeWidth={2} />
             Kopieren
           </button>
@@ -109,9 +82,7 @@ const Block = ({ block }: { block: CodeBlock }) => {
       <div className="flex w-full overflow-hidden rounded-md bg-bg-1">
         <div className="flex shrink-0 flex-col items-end border-r border-border-1 py-5 pl-5 pr-3">
           {lines.map((_, i) => (
-            <span key={i} className="mono text-base leading-6 text-text-3">
-              {String(start + i).padStart(2, "0")}
-            </span>
+            <span key={i} className="mono text-base leading-6 text-text-3">{String(i + 1).padStart(2, "0")}</span>
           ))}
         </div>
         <pre className="mono flex-1 overflow-x-auto py-5 pl-3 text-base leading-6 text-code-white">{highlight(lines.join("\n"))}</pre>
@@ -121,39 +92,30 @@ const Block = ({ block }: { block: CodeBlock }) => {
 };
 
 /**
- * Code-Karte: Fortschritt + Datei-Headline + Beschreibung,
- * Vorher-/Nachher-Code-Block(s) und Footer-Navigation.
+ * Code-Karte: navigiert durch alle Findings eines CWE, zeigt Vorher/Nachher-Code
+ * und ermöglicht das Markieren einzelner Dateien als gefixt.
  */
 const CodeCard = ({
   accent = "var(--critical)",
   icon = "ShieldAlert",
-  fileTitle = "Datei 1: utils.js",
-  lineRange = "Zeile 12-28",
-  description = "",
-  before,
-  after,
-  fileIndex = 1,
-  fileTotal = 4,
-  onPrev,
+  findings,
+  fixedIds,
   onMarkFixed,
-  onNext,
+  afterLabel = "Nachher:",
+  actionLabel = "Als gefixt markieren",
+  actionDoneLabel = "Gefixt",
 }: CodeCardProps) => {
-  const [fixed, setFixed] = useState(false);
-  const [index, setIndex] = useState(fileIndex);
+  const [index, setIndex] = useState(0);
 
-  const goPrev = () => {
-    if (index <= 1) return;
-    setIndex((i) => i - 1);
-    setFixed(false);
-    onPrev?.();
-  };
+  const total = findings.length;
+  const current = findings[Math.min(index, total - 1)];
+  const fixedCount = findings.filter((f) => fixedIds?.has(f.id)).length;
+  const isFixed = current ? (fixedIds?.has(current.id) ?? false) : false;
 
-  const goNext = () => {
-    if (index >= fileTotal) return;
-    setIndex((i) => i + 1);
-    setFixed(false);
-    onNext?.();
-  };
+  if (!current) return null;
+
+  const goPrev = () => setIndex((i) => Math.max(0, i - 1));
+  const goNext = () => setIndex((i) => Math.min(total - 1, i + 1));
 
   return (
     <div data-layer="CodeCard" className="flex w-full flex-col gap-6 rounded-md border border-border-2 bg-grouped-1 p-5 shadow-md">
@@ -161,10 +123,13 @@ const CodeCard = ({
       <div className="flex items-center gap-2">
         <span className="text-base text-text-disabled whitespace-nowrap">Fortschritt:</span>
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-grouped-2">
-          <span className="block h-full rounded-full transition-all duration-300" style={{ width: `${(index / fileTotal) * 100}%`, backgroundColor: accent }} />
+          <span
+            className="block h-full rounded-full transition-all duration-500"
+            style={{ width: `${total > 0 ? (fixedCount / total) * 100 : 0}%`, backgroundColor: accent }}
+          />
         </div>
         <span className="text-base text-text-disabled whitespace-nowrap">
-          Datei {index} / {fileTotal}
+          {fixedCount} / {total} gefixt
         </span>
       </div>
 
@@ -172,36 +137,33 @@ const CodeCard = ({
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Icon name={icon} size={24} strokeWidth={2} color={accent} />
-          <h3 className="text-xl font-bold leading-6 text-text-1">{fileTitle}</h3>
+          <h3 className="text-xl font-bold leading-6 text-text-1">{current.fileTitle}</h3>
         </div>
-        <span className="text-base text-text-2">{lineRange}</span>
+        <span className="text-base text-text-2">{current.lineRange}</span>
       </div>
 
       {/* Beschreibung */}
-      {description && <p className="text-base leading-6 text-text-1">{description}</p>}
+      {current.description && <p className="text-base leading-6 text-text-1">{current.description}</p>}
 
       {/* Code-Blöcke */}
       <div className="flex flex-col gap-4">
-        {before && <Block block={before} />}
-        <Block block={{ copyable: true, ...after }} />
+        {current.before && <CodeBlock label="Vorher:" tone="error" code={current.before} />}
+        <CodeBlock label={afterLabel} tone="success" code={current.after} copyable />
       </div>
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <Link label="Vorherige Datei" rightIcon={null} onClick={goPrev} disabled={index <= 1} />
+        <Link label="Vorherige Datei" rightIcon={null} onClick={goPrev} disabled={index <= 0} />
         <div className="flex items-center gap-3">
           <Button
             color="success"
             variant="filled"
             leftIcon="Check"
-            label={fixed ? "Als gefixt markiert" : "Als gefixt markieren"}
-            disabled={fixed}
-            onClick={() => {
-              setFixed(true);
-              onMarkFixed?.();
-            }}
+            label={isFixed ? actionDoneLabel : actionLabel}
+            disabled={isFixed}
+            onClick={() => onMarkFixed?.(current.id)}
           />
-          <Button color="primary" variant="filled" label="Nächste Datei" onClick={goNext} disabled={index >= fileTotal} />
+          <Button color="primary" variant="filled" label="Nächste Datei" onClick={goNext} disabled={index >= total - 1} />
         </div>
       </div>
     </div>
