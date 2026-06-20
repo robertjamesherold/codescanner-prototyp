@@ -14,7 +14,7 @@
   'use strict'
 
   // Erlaubte Quell-Domains. Beliebig erweiterbar.
-  var ALLOWED_HOSTS = ['robertjamesherold.com', 'www.robertjamesherold.com', 'localhost', '127.0.0.1']
+  var ALLOWED_HOSTS = ['robertjamesherold.com/codescanner', 'www.robertjamesherold.com/codescanner']
   var GRANT_KEY = 'pwa-install-granted'
 
   function refererAllowed() {
