@@ -16,7 +16,7 @@ function App() {
         <Routes>
           {/* Standard-Routen → Sidebar v1 */}
           <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Navigate to="/home" />} />
+          <Route path="/home" element={<Navigate to="/" />} />
           <Route path="/recent" element={<Recent />} />
           <Route path="/einstellungen" element={<Settings />} />
           <Route path="/import" element={<Import />} />
