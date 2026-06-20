@@ -32,6 +32,7 @@ function App() {
           <Route path="/absichern/mittel" element={<Absichern severity="mittel" />} />
           <Route path="/absichern/niedrig" element={<Absichern severity="niedrig" />} />
           <Route path="/optimieren" element={<Optimieren />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Layout.Page>
     </BrowserRouter>

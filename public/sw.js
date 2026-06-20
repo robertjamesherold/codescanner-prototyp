@@ -1,7 +1,16 @@
 /* Service Worker für die PWA.
-   Wird nur registriert, wenn der Nutzer von einer erlaubten Domain kommt
-   (siehe public/pwa-gate.js). Bietet einen App-Shell-Cache für Offline-Start. */
-const CACHE = 'rjh-pwa-v1'
+   Wird nur registriert, wenn der Nutzer über den Installieren-Link kommt
+   (siehe public/pwa-gate.js). Bietet einen App-Shell-Cache für Offline-Start.
+
+   Caching-Strategie:
+   - Navigationen        → network-first, offline Fallback auf den App-Shell.
+   - /assets/* (gehasht) → cache-first; diese Dateien sind durch ihren Hash
+                           unveränderlich, dürfen also dauerhaft gecached werden.
+   - Alles andere (pwa-gate.js, manifest.webmanifest, Icons, …) → network-first.
+     Diese haben STABILE Namen und ändern sich zwischen Deploys; cache-first
+     würde hier veraltete Versionen ausliefern (u. a. eine alte pwa-gate.js,
+     wodurch das Install-Angebot ausbleibt). Offline fallen sie auf den Cache. */
+const CACHE = 'rjh-pwa-v2'
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-192.png']
 
 self.addEventListener('install', (event) => {
@@ -19,10 +28,21 @@ self.addEventListener('activate', (event) => {
   )
 })
 
+/** Antwort in den Laufzeit-Cache legen (nur erfolgreiche, gleiche-Origin-GETs). */
+const putInCache = (request, response) => {
+  if (response && response.ok && response.type === 'basic') {
+    const copy = response.clone()
+    caches.open(CACHE).then((cache) => cache.put(request, copy))
+  }
+  return response
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event
-  // Nur GET wird gecached; alles andere (z. B. /api/*) geht direkt ins Netz.
+  // Nur GET wird behandelt; alles andere (z. B. /api/*) geht direkt ins Netz.
   if (request.method !== 'GET') return
+
+  const url = new URL(request.url)
 
   // SPA-Navigationen: Network-first mit Fallback auf den App-Shell (Offline).
   if (request.mode === 'navigate') {
@@ -32,17 +52,18 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Übrige GET-Requests: Cache-first, sonst Netz und in den Cache legen.
+  // Unveränderliche, gehashte Build-Assets: cache-first.
+  if (url.origin === self.location.origin && url.pathname.startsWith('/assets/')) {
+    event.respondWith(
+      caches.match(request).then((cached) => cached || fetch(request).then((r) => putInCache(request, r))),
+    )
+    return
+  }
+
+  // Alles andere: network-first (frisch halten), offline → Cache.
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached
-      return fetch(request).then((response) => {
-        if (response.ok && response.type === 'basic') {
-          const copy = response.clone()
-          caches.open(CACHE).then((cache) => cache.put(request, copy))
-        }
-        return response
-      })
-    }),
+    fetch(request)
+      .then((r) => putInCache(request, r))
+      .catch(() => caches.match(request)),
   )
 })
