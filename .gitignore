@@ -27,6 +27,7 @@ pnpm-debug.log*
 # Netlify
 .netlify/
 
-# Lokaler Backend-Datenordner (Interaktions-Zustand + Einstellungen mit API-Key!)
-# Reine Laufzeitdaten — der Backend-Code lebt in vite.config.ts.
-server/
+# Lokale Backend-Laufzeitdaten (Interaktions-Zustand + Einstellungen mit API-Key!).
+# Nur die JSON-Daten ignorieren — der geteilte Backend-CODE (server/core.ts) wird
+# committet und deployt (von vite.config.ts und der Netlify Function importiert).
+server/*.json

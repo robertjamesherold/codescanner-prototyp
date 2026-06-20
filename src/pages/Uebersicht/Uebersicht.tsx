@@ -2,12 +2,15 @@ import { useNavigate } from "react-router-dom";
 import Layout from "@/layout";
 import components from "@/components";
 import { useCleanup } from "@/data/cleanup";
+import { useOverview } from "@/data/overview";
 
 /** Seite "Übersicht" (/übersicht) — Topbar + Karten-Grid (gemäß Figma). */
 const Uebersicht = () => {
   const navigate = useNavigate();
   // Live-Kennzahlen der Bereinigung (persistierter Zustand, geteilt mit der Bereinigen-Seite).
   const { totals } = useCleanup();
+  // Übersichts-Kennzahlen vom Backend (Sicherheit, Optimierung, Risikoverlauf).
+  const { overview } = useOverview();
 
   return (
   <Layout.Content
@@ -28,7 +31,10 @@ const Uebersicht = () => {
         />
       </div>
       <div className="col-span-2">
-        <components.RiskCard onAction={() => navigate("/absichern/kritisch")} />
+        <components.RiskCard
+          count={overview.security.critical}
+          onAction={() => navigate("/absichern/kritisch")}
+        />
       </div>
 
       {/* Reihe 2 */}
@@ -53,20 +59,25 @@ const Uebersicht = () => {
           icon="TrendingUp"
           color="performance"
           title="Optimierungen"
-          primaryValue="25"
+          primaryValue={String(overview.optimization.open)}
           metrics={[
-            { icon: "Code", value: "1183", label: "LOC" },
-            { icon: "Clock", value: "~44", label: "Min" },
+            { icon: "Code", value: String(overview.optimization.loc), label: "LOC" },
+            { icon: "Clock", value: `~${overview.optimization.minutes}`, label: "Min" },
           ]}
-          high={7}
-          medium={12}
-          low={5}
+          high={overview.optimization.high}
+          medium={overview.optimization.medium}
+          low={overview.optimization.low}
+          onClick={() => navigate("/optimieren")}
         />
       </div>
 
       {/* Reihe 3 */}
       <div className="col-span-6">
-        <components.DiagramCard />
+        <components.DiagramCard
+          series={overview.history.series}
+          dates={overview.history.dates}
+          totalDelta={overview.history.totalDelta}
+        />
       </div>
     </div>
   </Layout.Content>

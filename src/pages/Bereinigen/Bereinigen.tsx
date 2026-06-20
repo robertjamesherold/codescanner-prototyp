@@ -1,12 +1,11 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import Layout from "@/layout";
 import components from "@/components";
-import data from "@/data";
-import { CLEANUP_ACCORDIONS, useCleanup, type CleanupCategory } from "@/data/cleanup";
+import { useCleanup, type CleanupCategory } from "@/data/cleanup";
 
 type IconName = Parameters<typeof components.StatCard>[0]["icon"];
 
-/** Stat-Karten je Kategorie (Titel = Tab = Accordion-Kategorie). */
+/** Stat-Karten je Kategorie (Titel = Tab = Accordion-Kategorie), in Anzeige-Reihenfolge. */
 const STAT_META: { icon: IconName; title: CleanupCategory }[] = [
   { icon: "Copy", title: "Redundanz" },
   { icon: "Trash2", title: "Ballast" },
@@ -24,6 +23,7 @@ const Bereinigen = () => {
     add: markApplied,
     remove: unmarkApplied,
     addMany,
+    accordions,
     statsFor,
     accordionDone,
     totals,
@@ -35,8 +35,22 @@ const Bereinigen = () => {
   // "Sicher bereinigen": alle niedrig eingestuften Befunde anwenden.
   const cleanAllSafe = () => addMany(safeIds);
 
-  const visibleStats = STAT_META.filter((s) => active === "Alle" || s.title === active);
-  const visibleAccordions = CLEANUP_ACCORDIONS.filter((a) => active === "Alle" || a.category === active);
+  // Nur Accordions mit tatsächlichen Befunden (leere Accordions ausblenden).
+  const foundAccordions = accordions.filter((a) => a.rows.length > 0);
+  // Kategorien, in denen überhaupt etwas gefunden wurde → steuern Tabs & Karten.
+  const categoriesWithFindings = new Set(foundAccordions.map((a) => a.category));
+
+  // Tabs nur für vorhandene Kategorien (+ "Alle"). Aktiver Tab wird auf "Alle"
+  // zurückgesetzt, falls seine Kategorie keine Befunde (mehr) hat.
+  const tabList = ["Alle", ...STAT_META.map((s) => s.title).filter((c) => categoriesWithFindings.has(c))];
+  const effectiveActive = tabList.includes(active) ? active : "Alle";
+
+  const visibleStats = STAT_META.filter(
+    (s) => categoriesWithFindings.has(s.title) && (effectiveActive === "Alle" || s.title === effectiveActive),
+  );
+  const visibleAccordions = foundAccordions.filter(
+    (a) => effectiveActive === "Alle" || a.category === effectiveActive,
+  );
 
   // Fertige Einträge ans Ende sortieren (stabil: gleiche Reihenfolge innerhalb der Gruppen).
   const orderedStats = [...visibleStats].sort(
@@ -99,10 +113,19 @@ const Bereinigen = () => {
     >
       <div className="mx-auto max-w-300 px-8  space-y-5  py-6">
 
-        <components.Tabbar active={active} setActive={setActive} tabs={Object.values(data.tabs)[0]} />
+        <components.Tabbar
+          active={effectiveActive}
+          setActive={setActive}
+          tabs={{ Name: "Bereinigen", Tabs: tabList }}
+        />
 
-
-        {/* Grid: links Stat-Karten, rechts Accordions */}
+        {foundAccordions.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 rounded-md border border-border-2 bg-grouped-1 px-8 py-16 text-center shadow-md">
+            <span className="cardtitle text-text-1">Keine Bereinigungs-Befunde</span>
+            <span className="body text-text-3">Für dieses Projekt wurde nichts zum Bereinigen gefunden.</span>
+          </div>
+        ) : (
+        /* Grid: links Stat-Karten, rechts Accordions */
         <div className="grid grid-cols-6 gap-5">
           <div className="col-span-2 flex flex-col gap-4">
             {orderedStats.map((s) => {
@@ -127,7 +150,7 @@ const Bereinigen = () => {
                     high={st.high}
                     medium={st.medium}
                     low={st.low}
-                    highlighted={active !== "Alle"}
+                    highlighted={effectiveActive !== "Alle"}
                     onClick={() => setActive(s.title)}
                   />
                 </div>
@@ -156,6 +179,7 @@ const Bereinigen = () => {
             ))}
           </div>
         </div>
+        )}
       </div>
     </Layout.Content>
 

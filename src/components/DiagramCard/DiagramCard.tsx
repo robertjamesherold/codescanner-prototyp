@@ -7,18 +7,24 @@ type Series = {
   name: string;
   value: number;
   delta: number;
-  color: string;
   data: number[];
 };
 
-/** Datenreihen (letzte 10 Analysen), absteigender Verlauf gemäß Figma. */
-const SERIES: Series[] = [
-  { key: "security", name: "Sicherheit", value: 15, delta: -4, color: "var(--security)", data: [28, 27, 26, 24, 22, 20, 19, 17, 16, 15] },
-  { key: "quality", name: "Qualität", value: 17, delta: -5, color: "var(--quality)", data: [32, 31, 29, 28, 26, 24, 22, 20, 18, 17] },
-  { key: "performance", name: "Leistung", value: 24, delta: -6, color: "var(--performance)", data: [40, 38, 36, 34, 32, 30, 29, 27, 25, 24] },
+/** Farbtoken je Datenreihe (Darstellung bleibt im Component, Daten kommen rein). */
+const SERIES_COLOR: Record<SeriesKey, string> = {
+  security: "var(--security)",
+  quality: "var(--quality)",
+  performance: "var(--performance)",
+};
+
+/** Default-Datenreihen (letzte 10 Analysen) — überschreibbar via Props. */
+const DEFAULT_SERIES: Series[] = [
+  { key: "security", name: "Sicherheit", value: 15, delta: -4, data: [28, 27, 26, 24, 22, 20, 19, 17, 16, 15] },
+  { key: "quality", name: "Qualität", value: 17, delta: -5, data: [32, 31, 29, 28, 26, 24, 22, 20, 18, 17] },
+  { key: "performance", name: "Leistung", value: 24, delta: -6, data: [40, 38, 36, 34, 32, 30, 29, 27, 25, 24] },
 ];
 
-const DATES = ["3. Feb", "5. Feb", "7. Feb", "9. Feb", "11. Feb"];
+const DEFAULT_DATES = ["3. Feb", "5. Feb", "7. Feb", "9. Feb", "11. Feb"];
 const Y_TICKS = [60, 45, 30, 15, 0];
 const W = 1000;
 const H = 200;
@@ -52,9 +58,18 @@ const areaPath = (data: number[]) => `${smoothPath(toPoints(data))} L ${W} ${H} 
  * Diagramm-Karte "Risikoverlauf" — gestapelte Flächen für Sicherheit/Qualität/Leistung.
  * Klick auf einen Wert in der Legende zeigt die zugehörige Linie solo (erneuter Klick = alle).
  */
-const DiagramCard = () => {
+type DiagramCardProps = {
+  series?: Series[];
+  dates?: string[];
+  /** Gesamtveränderung des Risiko-Scores (Badge im Header). */
+  totalDelta?: number;
+};
+
+const DiagramCard = ({ series = DEFAULT_SERIES, dates = DEFAULT_DATES, totalDelta = -23 }: DiagramCardProps) => {
   const [solo, setSolo] = React.useState<SeriesKey | null>(null);
 
+  const SERIES = series;
+  const DATES = dates;
   const visible = solo ? SERIES.filter((s) => s.key === solo) : SERIES;
   // Größte Fläche zuerst zeichnen (hinten), kleinste vorne.
   const ordered = [...visible].sort((a, b) => Math.max(...b.data) - Math.max(...a.data));
@@ -72,7 +87,7 @@ const DiagramCard = () => {
               style={{ backgroundColor: "color-mix(in srgb, var(--success) 20%, transparent)", color: "var(--success)" }}
             >
               <Icon name="TrendingDown" size={12} strokeWidth={2.5} />
-              -23
+              {totalDelta}
             </span>
           </div>
           <span className="text-sm text-text-3">Letzte 10 Analysen</span>
@@ -93,7 +108,7 @@ const DiagramCard = () => {
                   dimmed ? "opacity-40 hover:opacity-70" : "opacity-100"
                 }`}
               >
-                <span className="h-[3px] w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
+                <span className="h-[3px] w-2.5 rounded-full" style={{ backgroundColor: SERIES_COLOR[s.key] }} />
                 <span className="text-sm text-text-3">{s.name}</span>
                 <span className="text-sm font-bold text-text-1">{s.value}</span>
                 <span className="text-sm" style={{ color: "var(--success)" }}>
@@ -145,8 +160,8 @@ const DiagramCard = () => {
             <defs>
               {visible.map((s) => (
                 <linearGradient key={s.key} id={`diag-grad-${s.key}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={s.color} stopOpacity={0.35} />
-                  <stop offset="100%" stopColor={s.color} stopOpacity={0.03} />
+                  <stop offset="0%" stopColor={SERIES_COLOR[s.key]} stopOpacity={0.35} />
+                  <stop offset="100%" stopColor={SERIES_COLOR[s.key]} stopOpacity={0.03} />
                 </linearGradient>
               ))}
             </defs>
@@ -163,7 +178,7 @@ const DiagramCard = () => {
             ))}
             {/* Linien */}
             {ordered.map((s) => (
-              <path key={`line-${s.key}`} d={linePath(s.data)} fill="none" stroke={s.color} strokeWidth="2" vectorEffect="non-scaling-stroke" />
+              <path key={`line-${s.key}`} d={linePath(s.data)} fill="none" stroke={SERIES_COLOR[s.key]} strokeWidth="2" vectorEffect="non-scaling-stroke" />
             ))}
           </svg>
         </div>

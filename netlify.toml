@@ -1,10 +1,19 @@
-# Netlify-Konfiguration für den CodeScanner-Prototyp (Vite/React SPA)
+# Netlify-Konfiguration für den CodeScanner-Prototyp (Vite/React SPA + Functions)
 [build]
   command = "npm run build"
   publish = "dist"
 
-# SPA-Fallback: alle Routen auf index.html (Client-Routing via react-router).
-# (Redundant zu public/_redirects, aber schadet nicht und dokumentiert das Verhalten.)
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# API → Netlify Function (muss VOR dem SPA-Fallback stehen, erste Übereinstimmung gewinnt).
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# SPA-Fallback: alle übrigen Routen auf index.html (Client-Routing via react-router).
 [[redirects]]
   from = "/*"
   to = "/index.html"
