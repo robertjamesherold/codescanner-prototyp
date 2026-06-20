@@ -1,10 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import Layout from "@/layout";
 import components from "@/components";
+import { useCleanup } from "@/data/cleanup";
 
 /** Seite "Übersicht" (/übersicht) — Topbar + Karten-Grid (gemäß Figma). */
 const Uebersicht = () => {
   const navigate = useNavigate();
+  // Live-Kennzahlen der Bereinigung (persistierter Zustand, geteilt mit der Bereinigen-Seite).
+  const { totals } = useCleanup();
 
   return (
   <Layout.Content
@@ -15,6 +18,11 @@ const Uebersicht = () => {
       {/* Reihe 1 */}
       <div className="col-span-4">
         <components.RecommendedStepCard
+          stats={[
+            { icon: "AlertTriangle", label: `${totals.open} Befunde` },
+            { icon: "Code", label: `${totals.loc} LOC` },
+            { icon: "Clock", label: `~${totals.minutes} Min` },
+          ]}
           onPrimary={() => navigate("/bereinigen")}
           onSkip={() => navigate("/absichern/kritisch")}
         />
@@ -29,15 +37,15 @@ const Uebersicht = () => {
           icon="Eraser"
           color="quality"
           title="Bereinigung"
-          primaryValue="28"
+          primaryValue={String(totals.open)}
           metrics={[
-            { icon: "AlertTriangle", value: "120", label: "Dopplungen" },
-            { icon: "Code", value: "931", label: "LOC" },
-            { icon: "Clock", value: "~8", label: "Min" },
+            { icon: "Code", value: String(totals.loc), label: "LOC" },
+            { icon: "Clock", value: `~${totals.minutes}`, label: "Min" },
           ]}
-          high={5}
-          medium={8}
-          low={15}
+          high={totals.high}
+          medium={totals.medium}
+          low={totals.low}
+          onClick={() => navigate("/bereinigen")}
         />
       </div>
       <div className="col-span-3">

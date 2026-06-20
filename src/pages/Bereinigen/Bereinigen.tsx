@@ -2,86 +2,12 @@ import { useLayoutEffect, useRef, useState } from "react";
 import Layout from "@/layout";
 import components from "@/components";
 import data from "@/data";
+import { CLEANUP_ACCORDIONS, useCleanup, type CleanupCategory } from "@/data/cleanup";
 
 type IconName = Parameters<typeof components.StatCard>[0]["icon"];
-type Severity = "hoch" | "mittel" | "niedrig";
-type Category = "Redundanz" | "Ballast" | "Struktur";
-
-type CleanupRow = {
-  id: string;
-  label: string;
-  severity: Severity;
-  path: string;
-  loc: number;
-  /** Geschätzter Aufwand in Minuten (fließt in die Karten-Metrik). */
-  minutes: number;
-  detail: string;
-  applyable: boolean;
-};
-
-type CleanupAccordion = { title: string; category: Category; rows: CleanupRow[] };
-
-/**
- * Bereinigungs-Befunde je Accordion. Jede Zeile hat eine eindeutige ID,
- * damit ihr Abschluss-Zustand auf Seitenebene verfolgt und in die Stat-Karten
- * eingerechnet werden kann.
- */
-const ACCORDIONS: CleanupAccordion[] = [
-  {
-    title: "Doppelte Dateien",
-    category: "Redundanz",
-    rows: [
-      { id: "dup-1", label: "utils-copy.ts ist identisch mit utils.ts", severity: "niedrig", path: "src/lib/utils-copy.ts", loc: 87, minutes: 2, detail: "100% identischer Inhalt. Die Kopie wird nirgends importiert und kann gefahrlos gelöscht werden.", applyable: true },
-      { id: "dup-2", label: "config.backup.ts dupliziert config.ts", severity: "niedrig", path: "src/config/config.backup.ts", loc: 124, minutes: 2, detail: "Veraltete Sicherungskopie der Konfiguration. Im Projekt wurden keine Referenzen gefunden.", applyable: true },
-      { id: "dup-3", label: "types-v2.d.ts überlappt mit types.d.ts", severity: "mittel", path: "src/types/types-v2.d.ts", loc: 45, minutes: 5, detail: "87% überschneidende Typdefinitionen. Beide Dateien zusammenführen und Importe anpassen.", applyable: true },
-    ],
-  },
-  {
-    title: "Doppelter Code",
-    category: "Redundanz",
-    rows: [
-      { id: "code-1", label: "fetchWithRetry() in api/ und services/ kopiert", severity: "hoch", path: "src/services/http.ts", loc: 58, minutes: 8, detail: "Nahezu identische Retry-Logik an zwei Stellen. In einen gemeinsamen HTTP-Client auslagern.", applyable: true },
-      { id: "code-2", label: "formatDate() dreifach dupliziert", severity: "mittel", path: "src/utils/date.ts", loc: 36, minutes: 4, detail: "Gleiche Datumsformatierung in date.ts, table.tsx und export.ts. In eine Hilfsfunktion zentralisieren.", applyable: true },
-      { id: "code-3", label: "E-Mail-Validierung mehrfach implementiert", severity: "niedrig", path: "src/forms/validate.ts", loc: 22, minutes: 3, detail: "Identische Regex in vier Formularen. In eine wiederverwendbare Validierung überführen.", applyable: true },
-    ],
-  },
-  {
-    title: "Toter Code",
-    category: "Ballast",
-    rows: [
-      { id: "dead-1", label: "parseLegacyFormat() wird nie aufgerufen", severity: "mittel", path: "src/import/legacy.ts", loc: 41, minutes: 4, detail: "Funktion ohne Aufrufer seit der API-Umstellung. Kann ersatzlos entfernt werden.", applyable: true },
-      { id: "dead-2", label: "Auskommentierter Login-Flow in auth.service.ts", severity: "niedrig", path: "src/auth/auth.service.ts", loc: 18, minutes: 1, detail: "Veralteter, auskommentierter Codeblock. Der Versionsverlauf macht ihn überflüssig.", applyable: true },
-    ],
-  },
-  {
-    title: "Ungenutzte Exports",
-    category: "Ballast",
-    rows: [
-      { id: "exp-1", label: "5 ungenutzte Abhängigkeiten in package.json", severity: "hoch", path: "package.json", loc: 12, minutes: 6, detail: "moment, left-pad u. a. werden nicht mehr verwendet. Deinstallieren reduziert die Bundle-Größe.", applyable: true },
-      { id: "exp-2", label: "<LegacyButton/> wird nicht referenziert", severity: "mittel", path: "src/components/LegacyButton.tsx", loc: 64, minutes: 3, detail: "Komponente ohne Import. Wurde durch <Button/> ersetzt und kann gelöscht werden.", applyable: true },
-      { id: "exp-3", label: "export OLD_API_URL nirgends importiert", severity: "niedrig", path: "src/config/endpoints.ts", loc: 1, minutes: 1, detail: "Konstante ohne Verwendung. Kann sicher entfernt werden.", applyable: true },
-    ],
-  },
-  {
-    title: "Namen-Inkonsistenzen",
-    category: "Struktur",
-    rows: [
-      { id: "name-1", label: "Gemischte Schreibweise: userId vs. user_id", severity: "mittel", path: "src/models/", loc: 14, minutes: 4, detail: "camelCase und snake_case in sechs Modulen vermischt. Auf eine einheitliche Konvention bringen.", applyable: true },
-      { id: "name-2", label: "Dateinamen teils PascalCase, teils kebab-case", severity: "niedrig", path: "src/components/", loc: 8, minutes: 2, detail: "Uneinheitliche Benennung erschwert die Navigation. Auf PascalCase vereinheitlichen.", applyable: true },
-    ],
-  },
-  {
-    title: "Ordnerstruktur",
-    category: "Struktur",
-    rows: [
-      { id: "folder-1", label: "Komponenten über 3 Ordner verstreut", severity: "mittel", path: "src/", loc: 6, minutes: 5, detail: "Gleichartige Komponenten liegen in components/, ui/ und shared/. In einen Ordner zusammenführen.", applyable: true },
-      { id: "folder-2", label: "Tests neben Quellcode statt in __tests__", severity: "niedrig", path: "src/", loc: 5, minutes: 2, detail: "Testdateien liegen verteilt neben den Modulen. In dedizierte Testordner verschieben.", applyable: true },
-    ],
-  },
-];
 
 /** Stat-Karten je Kategorie (Titel = Tab = Accordion-Kategorie). */
-const STAT_META: { icon: IconName; title: Category }[] = [
+const STAT_META: { icon: IconName; title: CleanupCategory }[] = [
   { icon: "Copy", title: "Redundanz" },
   { icon: "Trash2", title: "Ballast" },
   { icon: "ListTree", title: "Struktur" },
@@ -90,61 +16,27 @@ const STAT_META: { icon: IconName; title: Category }[] = [
 /** Seite "Bereinigen" (/bereinigen) — Tabs + Stat-Karten + Accordions (gemäß Figma). */
 const Bereinigen = () => {
   const [active, setActive] = useState("Alle");
-  const [applied, setApplied] = useState<Set<string>>(() => new Set());
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const markApplied = (id: string) =>
-    setApplied((prev) => {
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
-
-  const unmarkApplied = (id: string) =>
-    setApplied((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
-
-  /** Offene (noch nicht abgeschlossene) Befunde einer Kategorie auswerten. */
-  const statsFor = (category: Category) => {
-    const open = ACCORDIONS.filter((a) => a.category === category)
-      .flatMap((a) => a.rows)
-      .filter((r) => !applied.has(r.id));
-    const count = (sev: Severity) => open.filter((r) => r.severity === sev).length;
-    return {
-      open: open.length,
-      high: count("hoch"),
-      medium: count("mittel"),
-      low: count("niedrig"),
-      loc: open.reduce((sum, r) => sum + r.loc, 0),
-      minutes: open.reduce((sum, r) => sum + r.minutes, 0),
-    };
-  };
-
-  const accordionDone = (a: CleanupAccordion) => a.rows.length > 0 && a.rows.every((r) => applied.has(r.id));
-
-  // Aggregierte Topbar-Werte über alle noch offenen Befunde.
-  const openRows = ACCORDIONS.flatMap((a) => a.rows).filter((r) => !applied.has(r.id));
-  const totalOpen = openRows.length;
-  const totalLoc = openRows.reduce((sum, r) => sum + r.loc, 0);
-  const totalMin = openRows.reduce((sum, r) => sum + r.minutes, 0);
-  const safeCount = openRows.filter((r) => r.severity === "niedrig").length;
-  const totalLow = ACCORDIONS.flatMap((a) => a.rows).filter((r) => r.severity === "niedrig").length;
+  // Persistenter Interaktions-Zustand + abgeleitete Kennzahlen (gemeinsame Quelle).
+  const {
+    applied,
+    add: markApplied,
+    remove: unmarkApplied,
+    addMany,
+    statsFor,
+    accordionDone,
+    totals,
+    safeCount,
+    totalLow,
+    safeIds,
+  } = useCleanup();
 
   // "Sicher bereinigen": alle niedrig eingestuften Befunde anwenden.
-  const cleanAllSafe = () =>
-    setApplied((prev) => {
-      const next = new Set(prev);
-      ACCORDIONS.flatMap((a) => a.rows)
-        .filter((r) => r.severity === "niedrig")
-        .forEach((r) => next.add(r.id));
-      return next;
-    });
+  const cleanAllSafe = () => addMany(safeIds);
 
   const visibleStats = STAT_META.filter((s) => active === "Alle" || s.title === active);
-  const visibleAccordions = ACCORDIONS.filter((a) => active === "Alle" || a.category === active);
+  const visibleAccordions = CLEANUP_ACCORDIONS.filter((a) => active === "Alle" || a.category === active);
 
   // Fertige Einträge ans Ende sortieren (stabil: gleiche Reihenfolge innerhalb der Gruppen).
   const orderedStats = [...visibleStats].sort(
@@ -193,9 +85,9 @@ const Bereinigen = () => {
         <Layout.Topbar
           variant="bereinigen"
           info={[
-            { icon: "AlertTriangle", value: String(totalOpen), label: "Befunde" },
-            { icon: "Code", value: String(totalLoc), label: "LOC" },
-            { icon: "Clock", value: `~${totalMin}`, label: "Min" },
+            { icon: "AlertTriangle", value: String(totals.open), label: "Befunde" },
+            { icon: "Code", value: String(totals.loc), label: "LOC" },
+            { icon: "Clock", value: `~${totals.minutes}`, label: "Min" },
           ]}
           primaryLabel={safeCount === 0 ? `${totalLow} Sicher bereinigt` : `${safeCount} Sicher bereinigen`}
           primaryDisabled={safeCount === 0}

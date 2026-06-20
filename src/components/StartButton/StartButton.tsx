@@ -1,6 +1,6 @@
 import Icon from "@/assets/icons";
 
-type StartButtonVariant = "folder" | "files" | "github" | "cloud";
+type StartButtonVariant = "demo" | "folder" | "files" | "github" | "cloud";
 
 type StartButtonProps = {
   variant: StartButtonVariant;
@@ -14,6 +14,7 @@ type StartButtonProps = {
 
 /** Icon + Farbtoken je Variante. */
 const VARIANTS: Record<StartButtonVariant, { icon: Parameters<typeof Icon>[0]["name"]; color: string }> = {
+  demo: { icon: "Play", color: "performance" },
   folder: { icon: "FolderOpen", color: "primary" },
   files: { icon: "Upload", color: "success" },
   github: { icon: "GitFork", color: "warning" },

@@ -60,7 +60,13 @@ const SidebarProjekt = () => {
           />
         </nav>
 
-        <footer className="flex flex-col items-center gap-4">
+        <footer className="flex w-full flex-col items-center gap-4">
+          <components.NavLink
+            to="/einstellungen"
+            icon={<Icon name="Wrench" strokeWidth={1.25} />}
+            label="Einstellungen"
+            isSideBarOpen={isSideBarOpen}
+          />
           <components.UpgradeBlock collapsed={!isSideBarOpen} />
         </footer>
       </div>

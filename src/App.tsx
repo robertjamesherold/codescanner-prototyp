@@ -6,6 +6,8 @@ import Uebersicht from "@/pages/Uebersicht";
 import Bereinigen from "@/pages/Bereinigen";
 import Absichern from "@/pages/Absichern";
 import Optimieren from "@/pages/Optimieren";
+import Settings from "@/pages/Settings";
+import Import from "@/pages/Import";
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/" element={<Navigate to="/home" />} />
           <Route path="/recent" element={<Recent />} />
+          <Route path="/einstellungen" element={<Settings />} />
+          <Route path="/import" element={<Import />} />
           <Route path="/current" element={<div />} />
           <Route path="/community" element={<div />} />
 
