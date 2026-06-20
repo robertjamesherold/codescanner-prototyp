@@ -49,11 +49,11 @@ const ProjectCard = ({
       type="button"
         to="/übersicht" // TODO: Link zum Projekt-Dashboard
       data-layer="ProjectCard"
-      className="group flex w-full cursor-pointer flex-col overflow-hidden rounded-md bg-grouped-1 text-left shadow-[0px_1px_2px_rgba(0,0,0,0.3),0px_2px_6px_2px_rgba(0,0,0,0.15)] transition-colors hover:bg-grouped-1-hover active:bg-grouped-1-pressed"
+      className="group flex w-full cursor-pointer flex-col overflow-hidden rounded-md bg-grouped-1 text-left shadow-md transition-colors hover:bg-grouped-1-hover active:bg-grouped-1-pressed border border-border-2 group-hover:border-border-2-hover group-active:border-border-2-pressed"
     >
       {/* Fortschritt */}
-      <div className="flex w-full flex-col border border-border-1 p-5 transition-colors group-hover:border-border-1-hover group-active:border-border-1-pressed">
-        <div className="flex w-full items-center border-b border-border-1 pb-3 transition-colors group-hover:border-border-1-hover group-active:border-border-1-pressed">
+      <div className="flex w-full flex-col p-5 transition-colors  ">
+        <div className="flex w-full items-center border-b border-border-2 pb-3 transition-colors">
           <span className="flex-1 text-base font-bold leading-6 text-text-1">Fortschritt</span>
         </div>
 
@@ -63,9 +63,24 @@ const ProjectCard = ({
       </div>
 
       {/* Projekt-Footer */}
-      <div className="flex w-full items-center gap-4 border-r border-b border-l border-border-1 bg-grouped-2 p-5 transition-colors group-hover:border-border-1-hover group-hover:bg-grouped-2-hover group-active:border-border-1-pressed group-active:bg-grouped-2-pressed">
-        <div className="flex shrink-0 items-center rounded-md bg-grouped-1 p-2 transition-colors group-hover:bg-grouped-1-hover group-active:bg-grouped-1-pressed">
-          <Icon name="Bot" size={28} strokeWidth={2} color="var(--primary)" />
+      <div className="flex w-full items-center gap-4  bg-grouped-2 p-5 transition-colors group-hover:bg-grouped-3-hover group-active:bg-grouped-3-pressed shadow-inverted-sm">
+        <div
+          className="flex shrink-0 items-center rounded-md p-2 transition-colors bg-[color:var(--bg-default)] group-hover:bg-[color:var(--bg-hover)] group-active:bg-[color:var(--bg-pressed)]"
+          style={{
+            // default, hover and active background mixes using primary variants
+            // color-mix produces an actual color; Tailwind picks it up via the CSS vars
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            ['--bg-default']: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+            ['--bg-hover']: 'color-mix(in srgb, var(--primary-hover) 20%, transparent)',
+            ['--bg-pressed']: 'color-mix(in srgb, var(--primary-pressed) 10%, transparent)',
+            // icon foreground variants (use stronger mixes)
+            ['--fg-default']: 'color-mix(in srgb, var(--primary) 100%, transparent)',
+            ['--fg-hover']: 'color-mix(in srgb, var(--primary-hover) 100%, transparent)',
+            ['--fg-pressed']: 'color-mix(in srgb, var(--primary-pressed) 100%, transparent)'
+          }}
+        >
+          <Icon name="Bot" size={28} strokeWidth={2} color="var(--fg-default)" />
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-xl font-bold leading-6 font-display text-text-1">{title}</span>

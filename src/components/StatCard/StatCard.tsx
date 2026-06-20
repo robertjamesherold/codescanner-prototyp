@@ -17,25 +17,37 @@ type StatCardProps = {
   low: number;
   /** Hervorgehoben: Rahmen in Akzentfarbe. */
   highlighted?: boolean;
+  /** Klick auf die Karte (z.B. um nach dieser Kategorie zu filtern). */
+  onClick?: () => void;
 };
 
 /**
  * Stat-Karte: IconBox + Titel + Primärwert, Metrik-Zeile,
  * Score-Balken (High/Medium/Low proportional) und Badges.
  */
-const StatCard = ({ icon, color, title, primaryValue, primaryUnit = "offen", metrics, high, medium, low, highlighted }: StatCardProps) => {
-  const accent = `var(--${color})`;
+const StatCard = ({ icon, color, title, primaryValue, primaryUnit = "offen", metrics, high, medium, low, highlighted, onClick }: StatCardProps) => {
+  // Nur Schweregrade mit Anzahl > 0 → ein leeres "0 Niedrig" verschwindet automatisch.
   const segments = [
     { n: high, label: "Hoch", c: "var(--high)" },
     { n: medium, label: "Mittel", c: "var(--medium)" },
     { n: low, label: "Niedrig", c: "var(--low)" },
-  ];
+  ].filter((s) => s.n > 0);
+  const accent = `var(--${color})`;
+  // Alle Befunde abgeschlossen → Balken/Badges durch einen Erledigt-Hinweis ersetzen
+  // (gleiche Karten-Höhe, keine Lücke) + abgedimmt auf 50% Deckkraft.
+  const allDone = high + medium + low === 0;
+  // Rahmenfarbe: erledigt → success, hervorgehoben → Akzent, sonst Standard.
+  const borderColor = allDone ? "var(--border-2)" : highlighted ? accent : "var(--border-2)";
 
   return (
     <div
       data-layer="StatCard"
-      className="flex h-35 w-full flex-col justify-between gap-4 rounded-md border border-border-2 bg-grouped-1 p-5"
-      style={highlighted ? { borderColor: accent } : undefined}
+      style={{ borderColor }}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } } : undefined}
+      className={`flex h-35 w-full flex-col justify-between gap-4 rounded-md border bg-grouped-1 p-5 transition-opacity duration-300 shadow-md  ${allDone ? "opacity-50" : ""} ${onClick ? "cursor-pointer transition-colors"  : ""}`}
     >
       {/* Kopf: IconBox + Titel/Primärwert + Metriken */}
       <div className="flex items-center gap-4">
@@ -68,24 +80,33 @@ const StatCard = ({ icon, color, title, primaryValue, primaryUnit = "offen", met
         </div>
       </div>
 
-      {/* Score-Balken + Badges */}
-      <div className="flex w-full flex-col gap-2">
-        <div className="flex h-2 w-full gap-1">
-          {segments.map((s) => (
-            <span key={s.label} className="rounded-full opacity-70" style={{ flex: s.n, backgroundColor: s.c }} />
-          ))}
+      {/* Score-Balken + Badges — oder Erledigt-Hinweis, wenn alles bereinigt ist */}
+      {allDone ? (
+        <div className="flex items-center gap-2">
+          <Icon name="CheckCircle" size={18} strokeWidth={2} color="var(--success)" />
+          <span className="text-base" style={{ color: "var(--success)" }}>
+            Alle Befunde bereinigt
+          </span>
         </div>
-        <div className="flex items-center gap-3">
-          {segments.map((s) => (
-            <div key={s.label} className="flex items-center gap-1">
-              <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: s.c }} />
-              <span className="text-base whitespace-nowrap" style={{ color: s.c }}>
-                {s.n} {s.label}
-              </span>
-            </div>
-          ))}
+      ) : (
+        <div className="flex w-full flex-col gap-2">
+          <div className="flex h-2 w-full gap-1">
+            {segments.map((s) => (
+              <span key={s.label} className="rounded-full opacity-70 transition-all duration-300" style={{ flex: s.n, backgroundColor: s.c }} />
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            {segments.map((s) => (
+              <div key={s.label} className="flex items-center gap-1">
+                <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: s.c }} />
+                <span className="text-base whitespace-nowrap" style={{ color: s.c }}>
+                  {s.n} {s.label}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

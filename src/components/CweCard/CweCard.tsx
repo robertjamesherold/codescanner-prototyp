@@ -56,7 +56,7 @@ const CweCard = ({
   return (
     <div
       data-layer="CweCard"
-      className="flex w-full flex-col gap-4 rounded-md border bg-grouped-1 p-5"
+      className="flex w-full flex-col gap-4 rounded-md border bg-grouped-1 p-5 shadow-md"
       style={{ borderColor: highlighted ? accent : "var(--border-2)" }}
     >
       {/* Kopf */}

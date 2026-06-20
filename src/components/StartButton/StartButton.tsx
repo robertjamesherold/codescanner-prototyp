@@ -12,22 +12,22 @@ type StartButtonProps = {
   onClick?: () => void;
 };
 
-/** Icon + Gradient je Variante (gemäß Figma). */
-const VARIANTS: Record<StartButtonVariant, { icon: Parameters<typeof Icon>[0]["name"]; gradient: string }> = {
-  folder: { icon: "FolderOpen", gradient: "linear-gradient(135deg, hsl(244,80%,64%), hsl(262,70%,52%))" },
-  files: { icon: "Upload", gradient: "linear-gradient(135deg, hsl(142,65%,48%), hsl(160,68%,38%))" },
-  github: { icon: "GitFork", gradient: "linear-gradient(135deg, hsl(32,95%,55%), hsl(18,85%,50%))" },
-  cloud: { icon: "Cloud", gradient: "linear-gradient(135deg, hsl(198,90%,56%), hsl(220,82%,54%))" },
+/** Icon + Farbtoken je Variante. */
+const VARIANTS: Record<StartButtonVariant, { icon: Parameters<typeof Icon>[0]["name"]; color: string }> = {
+  folder: { icon: "FolderOpen", color: "primary" },
+  files: { icon: "Upload", color: "success" },
+  github: { icon: "GitFork", color: "warning" },
+  cloud: { icon: "Cloud", color: "info" },
 };
 
-const DISABLED_GRADIENT = "linear-gradient(135deg, hsl(215,20%,82%), hsl(215,18%,70%))";
 
 /**
  * Auswahl-Karte auf der Home-Seite (Ordner öffnen, Dateien hochladen, …).
  * IconBox mit Farbgradient + weißem Icon, Titel (font-display) und Beschreibung.
  */
 const StartButton = ({ variant, title, description, badge, disabled, onClick }: StartButtonProps) => {
-  const { icon, gradient } = VARIANTS[variant];
+  const { icon, color } = VARIANTS[variant];
+  const accent = disabled ? "var(--text-disabled)" : `var(--${color})`;
 
   return (
     <button
@@ -35,7 +35,7 @@ const StartButton = ({ variant, title, description, badge, disabled, onClick }: 
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       data-layer="StartButton"
-      className={`group flex h-22 w-full items-center justify-start gap-6 rounded-md p-5 text-left shadow-[0px_1px_2px_rgba(0,0,0,0.3),0px_2px_6px_2px_rgba(0,0,0,0.15)] transition-colors ${
+      className={`group flex h-22 w-full items-center justify-start gap-6 rounded-md p-5 text-left shadow-md transition-colors ${
         disabled
           ? "bg-grouped-1-disabled cursor-default"
           : "bg-grouped-1 cursor-pointer hover:bg-grouped-1-hover active:bg-grouped-1-pressed"
@@ -43,10 +43,10 @@ const StartButton = ({ variant, title, description, badge, disabled, onClick }: 
     >
       {/* IconBox */}
       <div
-        className="flex size-13 shrink-0 items-center justify-center rounded-md shadow-[0px_1px_2px_rgba(0,0,0,0.25)]"
-        style={{ backgroundImage: disabled ? DISABLED_GRADIENT : gradient }}
+        className="flex size-13 shrink-0 items-center justify-center rounded-md"
+        style={{ backgroundColor: `color-mix(in srgb, ${accent} 20%, transparent)` }}
       >
-        <Icon name={icon} size={32} strokeWidth={2} color="white" />
+        <Icon name={icon} size={32} strokeWidth={2} color={accent} />
       </div>
 
       {/* Text */}

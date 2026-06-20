@@ -17,6 +17,14 @@ type TopbarProps = {
   onBack?: () => void;
   onSkip?: () => void;
   onPrimaryAction?: () => void;
+  /** Überschreibt das Label des Primär-Buttons (z.B. "12 Sicher bereinigen"). */
+  primaryLabel?: string;
+  /** Deaktiviert den Primär-Button. */
+  primaryDisabled?: boolean;
+  /** Erledigt-Zustand des Primär-Buttons → Success-Farbe (disabled). */
+  primaryDone?: boolean;
+  /** Überschreibt die Info-Zeile (Icon/Wert/Label) der Standard-Varianten. */
+  info?: { icon: IconName; value: string; label: string }[];
   /** Nur bei variant="recent": gesteuertes Suchfeld. */
   search?: string;
   onSearchChange?: (value: string) => void;
@@ -152,6 +160,10 @@ const Topbar = ({
   onBack,
   onSkip,
   onPrimaryAction,
+  primaryLabel,
+  primaryDisabled,
+  primaryDone,
+  info,
   search,
   onSearchChange,
 }: TopbarProps) => {
@@ -159,7 +171,7 @@ const Topbar = ({
   const [recentFilter, setRecentFilter] = useState(RECENT_FILTERS[0]);
 
   const wrapper =
-    "w-full border-b border-border-1 bg-bg-2  py-6 shadow-[0px_1px_2px_rgba(0,0,0,0.15),0px_1px_3px_rgba(0,0,0,0.1)]";
+    "w-full border-b border-border-1 bg-bg-2/70 [--surface:var(--bg-2)] backdrop-blur-xl backdrop-saturate-150 h-48 z-200 py-6 ";
 
   // Standard-Aktion je Seite — durch onPrimaryAction/onSkip überschreibbar.
   const defaultPrimary: () => void =
@@ -253,7 +265,7 @@ const Topbar = ({
   if (variant === "bereinigen") {
     actions = (
       <>
-        <Button color="primary" variant="filled" label="15 Sicher bereinigen" leftIcon="Sparkles" onClick={handlePrimary} />
+        <Button color={primaryDone ? "success" : "primary"} variant="filled" label={primaryLabel ?? "15 Sicher bereinigen"} leftIcon="CheckSquare" onClick={handlePrimary} disabled={primaryDisabled} className="min-w-fit" />
         <Button color="secondary" variant="outlined" label="Überspringen" onClick={handleSkip} />
       </>
     );
@@ -273,11 +285,12 @@ const Topbar = ({
     );
   }
 
+  const infoItems = info ?? INFO[variant];
   const bottom =
     variant === "absichern" ? (
       <PatternRow patterns={SEVERITY_PATTERNS[severity]} />
-    ) : INFO[variant] ? (
-      <InfoRow items={INFO[variant]!} />
+    ) : infoItems ? (
+      <InfoRow items={infoItems} />
     ) : null;
 
   return (

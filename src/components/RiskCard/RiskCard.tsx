@@ -42,7 +42,7 @@ const RiskCard = ({
   const accent = `var(--${color})`;
 
   return (
-    <div data-layer="RiskCard" className="flex h-full w-full flex-col overflow-hidden rounded-md border border-border-2 bg-grouped-1">
+    <div data-layer="RiskCard" className="flex h-full w-full flex-col overflow-hidden rounded-md border border-border-2 bg-grouped-1 shadow-md [--surface:var(--grouped-1)]">
       {/* Header (getönt) */}
       <div className="relative flex items-center gap-2 py-3 pl-4 pr-3">
         <span aria-hidden className="absolute inset-0 opacity-10" style={{ backgroundColor: accent }} />

@@ -156,7 +156,7 @@ const CodeCard = ({
   };
 
   return (
-    <div data-layer="CodeCard" className="flex w-full flex-col gap-6 rounded-md border border-border-2 bg-grouped-1 p-5">
+    <div data-layer="CodeCard" className="flex w-full flex-col gap-6 rounded-md border border-border-2 bg-grouped-1 p-5 shadow-md">
       {/* Fortschritt */}
       <div className="flex items-center gap-2">
         <span className="text-base text-text-disabled whitespace-nowrap">Fortschritt:</span>

@@ -40,7 +40,7 @@
     text-wrap: pretty;
   }
   
-  .card-base { @apply bg-grouped-1 border border-border-2 rounded-md px-8 py-12; box-shadow: var(--shadow-card); }
+  .card-base { @apply bg-grouped-1 border border-border-2 rounded-md px-8 py-12; box-shadow: var(--effect-style-card); }
 
 }
 

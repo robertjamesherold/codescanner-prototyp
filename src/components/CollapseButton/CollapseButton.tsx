@@ -18,7 +18,7 @@ const CollapseButton = ({ isSideBarOpen, onToggle }: CollapseButtonProps) => {
       aria-label={isSideBarOpen ? "Sidebar einklappen" : "Sidebar aufklappen"}
       aria-expanded={isSideBarOpen}
       data-layer="Collapse-Button"
-      className="absolute -right-3.5 top-16 z-20 flex size-7 items-center justify-center rounded-full border border-grouped-3 bg-grouped-3 text-icon-1 cursor-pointer transition-colors hover:border-grouped-3-hover hover:bg-grouped-3-hover active:border-grouped-3-pressed active:bg-grouped-3-pressed"
+      className="absolute -right-3.5 top-16 z-20 flex size-7 items-center justify-center rounded-full border border-border-1 bg-grouped-3 text-icon-1 cursor-pointer transition-colors hover:border-grouped-3-hover hover:bg-grouped-3-hover active:border-grouped-3-pressed active:bg-grouped-3-pressed shadow-md"
     >
       <Icon
         name={isSideBarOpen ? "ChevronLeft" : "ChevronRight"}

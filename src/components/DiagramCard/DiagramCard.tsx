@@ -60,7 +60,7 @@ const DiagramCard = () => {
   const ordered = [...visible].sort((a, b) => Math.max(...b.data) - Math.max(...a.data));
 
   return (
-    <div data-layer="DiagramCard" className="flex w-full flex-col gap-6 rounded-md border border-border-2 bg-grouped-1 p-5">
+    <div data-layer="DiagramCard" className="flex w-full flex-col gap-6 rounded-md border border-border-2 bg-grouped-1 p-5 shadow-md">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         {/* Left: Titel + Badge + Untertitel */}

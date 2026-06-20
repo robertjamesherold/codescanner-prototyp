@@ -50,10 +50,10 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
     "active:bg-[var(--btn-pressed)] active:border-[var(--btn-pressed)] " +
     "disabled:bg-[var(--btn-disabled)] disabled:border-[var(--btn-disabled)]",
   outlined:
-    "border bg-transparent text-[var(--btn)] border-[var(--btn)] " +
-    "hover:bg-[var(--btn)]/10 hover:text-[var(--btn-hover)] hover:border-[var(--btn-hover)] " +
-    "active:bg-[var(--btn)]/20 active:text-[var(--btn-pressed)] active:border-[var(--btn-pressed)] " +
-    "disabled:bg-transparent disabled:text-[var(--btn-disabled)] disabled:border-[var(--btn-disabled)]",
+    "border bg-[var(--surface)] text-[var(--btn)] border-[var(--btn)] " +
+    "hover:bg-[color-mix(in_srgb,var(--btn)_10%,var(--surface))] hover:text-[var(--btn-hover)] hover:border-[var(--btn-hover)] " +
+    "active:bg-[color-mix(in_srgb,var(--btn)_20%,var(--surface))] active:text-[var(--btn-pressed)] active:border-[var(--btn-pressed)] " +
+    "disabled:bg-[var(--surface)] disabled:text-[var(--btn-disabled)] disabled:border-[var(--btn-disabled)]",
   ghost:
     "border border-transparent bg-transparent text-[var(--btn)] " +
     "hover:bg-[var(--btn)]/10 hover:text-[var(--btn-hover)] " +

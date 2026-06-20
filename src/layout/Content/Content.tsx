@@ -10,17 +10,31 @@ type ContentProps = {
   className?: string;
 };
 
+/** Höhen der überlagernden Glass-Bars (entsprechen dem bisherigen Grid-Layout). */
+const TOPBAR_H = 192;
+const BOTTOMBAR_H = 88;
+
 /**
  * Rechter Seitenbereich neben der Sidebar.
- * Drei Reihen: Topbar (falls vorhanden) · Inhalt · Bottombar (falls vorhanden).
- * Fehlt eine Bar, dehnt sich die mittlere Reihe (flex-1) über die fehlende Reihe aus.
+ * Der Inhalt scrollt unter den überlagerten Glass-Bars (Topbar/Bottombar) hindurch,
+ * damit der Backdrop-Blur den durchscheinenden Inhalt zeigt. Padding hält den
+ * Inhalt frei von den Bars.
  */
 const Content = ({ topbar, bottombar, children, className }: ContentProps) => {
   return (
-    <div data-layer="Content" className="flex h-full min-h-0 w-full flex-col">
-      {topbar && <div className="shrink-0">{topbar}</div>}
-      <div className={`min-h-0 flex-1 overflow-auto ${className ?? ""}`}>{children}</div>
-      {bottombar && <div className="shrink-0">{bottombar}</div>}
+    <div data-layer="Content" className="relative h-full min-h-0 w-full overflow-hidden">
+      <div
+        className={`h-full overflow-auto ${className ?? ""}`}
+        style={{
+          paddingTop: topbar ? TOPBAR_H : undefined,
+          paddingBottom: bottombar ? BOTTOMBAR_H : undefined,
+        }}
+      >
+        {children}
+      </div>
+
+      {topbar && <div className="absolute inset-x-0 top-0 z-1000 shadow-lg">{topbar}</div>}
+      {bottombar && <div className="absolute inset-x-0 bottom-0 z-1000 shadow-inverted-md">{bottombar}</div>}
     </div>
   );
 };

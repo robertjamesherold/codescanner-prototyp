@@ -16,6 +16,7 @@ import CweCard from './CweCard';
 import CodeCard from './CodeCard';
 import Accordion from './Accordion';
 import Tabbar from './Tabbar';
+import Alert from './Alert';
 
 const components = {
   NavLink: NavLink,
@@ -36,6 +37,7 @@ const components = {
   CodeCard: CodeCard,
   Accordion: Accordion,
   Tabbar: Tabbar,
+  Alert: Alert,
 };
 
 export default components;

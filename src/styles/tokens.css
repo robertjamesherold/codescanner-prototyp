@@ -24,8 +24,11 @@
   /* Shared across schemes */
   --transparency: hsla(0, 0%, 100%, 0);
 
-  /* Unified card elevation (Elevated/3 from the Figma design) */
-  --shadow-card: 0px 1px 3px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+  /* Füllfarbe der aktuellen Oberfläche — von Containern überschrieben,
+     damit Outlined-Buttons deckend in der Container-Farbe füllen können. */
+  --surface: var(--bg-1);
+
+  /* Card-Elevation ist modusabhängig → in den Light/Dark-Blöcken definiert. */
 
   /* Upgrade-Block-Gradient (über bg-2 via mix-blend, gemäß Figma) */
     --upgrade-gradient:  linear-gradient(180deg, hsl(244, 75%, 59%) 0%, hsl(220, 80%, 53%) 100%);
@@ -38,6 +41,23 @@
 :root,
 :root[data-theme='light'] {
   color-scheme: light;
+
+  /* --- Shadows --- */
+
+/* Weiche, zentrierte 2-Lagen-Elevation (Ambient + Key), je Stufe tiefer. */
+--effect-style-elevated-1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.10);
+--effect-style-elevated-2: 0 2px 4px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.08);
+--effect-style-elevated-3: 0 4px 8px rgba(0, 0, 0, 0.06), 0 8px 16px rgba(0, 0, 0, 0.10);
+--effect-style-elevated-4: 0 8px 16px rgba(0, 0, 0, 0.08), 0 16px 32px rgba(0, 0, 0, 0.12);
+--effect-style-elevated-5: 0 12px 24px rgba(0, 0, 0, 0.10), 0 24px 48px rgba(0, 0, 0, 0.14);
+--effect-style-card: 0 2px 6px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.08);
+
+/* Inverted (Schatten nach oben — y-Offset negiert) */
+--effect-style-inverted-elevated-1: 0 -1px 2px rgba(0, 0, 0, 0.06), 0 -1px 3px rgba(0, 0, 0, 0.10);
+--effect-style-inverted-elevated-2: 0 -2px 4px rgba(0, 0, 0, 0.06), 0 -4px 8px rgba(0, 0, 0, 0.08);
+--effect-style-inverted-elevated-3: 0 -4px 8px rgba(0, 0, 0, 0.06), 0 -8px 16px rgba(0, 0, 0, 0.10);
+--effect-style-inverted-elevated-4: 0 -8px 16px rgba(0, 0, 0, 0.08), 0 -16px 32px rgba(0, 0, 0, 0.12);
+--effect-style-inverted-elevated-5: 0 -12px 24px rgba(0, 0, 0, 0.10), 0 -24px 48px rgba(0, 0, 0, 0.14);
 
   /* --- Brand --- */
   --primary: hsl(244, 75%, 59%);
@@ -245,6 +265,21 @@
   :root:not([data-theme='light']) {
     color-scheme: dark;
 
+    /* Weiche, zentrierte 2-Lagen-Elevation — im Dark Mode tiefer/deckender. */
+    --effect-style-elevated-1: 0 1px 2px rgba(0, 0, 0, 0.40), 0 1px 3px rgba(0, 0, 0, 0.30);
+    --effect-style-elevated-2: 0 2px 4px rgba(0, 0, 0, 0.40), 0 4px 8px rgba(0, 0, 0, 0.32);
+    --effect-style-elevated-3: 0 4px 8px rgba(0, 0, 0, 0.40), 0 8px 16px rgba(0, 0, 0, 0.36);
+    --effect-style-elevated-4: 0 8px 16px rgba(0, 0, 0, 0.45), 0 16px 32px rgba(0, 0, 0, 0.40);
+    --effect-style-elevated-5: 0 12px 24px rgba(0, 0, 0, 0.50), 0 24px 48px rgba(0, 0, 0, 0.45);
+    --effect-style-card: 0 2px 6px rgba(0, 0, 0, 0.40), 0 8px 24px rgba(0, 0, 0, 0.32);
+
+    /* Inverted (Schatten nach oben — y-Offset negiert) */
+    --effect-style-inverted-elevated-1: 0 -1px 2px rgba(0, 0, 0, 0.40), 0 -1px 3px rgba(0, 0, 0, 0.30);
+    --effect-style-inverted-elevated-2: 0 -2px 4px rgba(0, 0, 0, 0.40), 0 -4px 8px rgba(0, 0, 0, 0.32);
+    --effect-style-inverted-elevated-3: 0 -4px 8px rgba(0, 0, 0, 0.40), 0 -8px 16px rgba(0, 0, 0, 0.36);
+    --effect-style-inverted-elevated-4: 0 -8px 16px rgba(0, 0, 0, 0.45), 0 -16px 32px rgba(0, 0, 0, 0.40);
+    --effect-style-inverted-elevated-5: 0 -12px 24px rgba(0, 0, 0, 0.50), 0 -24px 48px rgba(0, 0, 0, 0.45);
+
     /* --- Brand --- */
     --primary: hsl(241, 100%, 69%);
     --primary-hover: hsl(241, 100%, 74%);
@@ -448,6 +483,21 @@ background-blend-mode: lighten, normal;
    ========================================================================== */
 :root[data-theme='dark'] {
   color-scheme: dark;
+
+    /* Weiche, zentrierte 2-Lagen-Elevation — im Dark Mode tiefer/deckender. */
+    --effect-style-elevated-1: 0 1px 2px rgba(0, 0, 0, 0.40), 0 1px 3px rgba(0, 0, 0, 0.30);
+    --effect-style-elevated-2: 0 2px 4px rgba(0, 0, 0, 0.40), 0 4px 8px rgba(0, 0, 0, 0.32);
+    --effect-style-elevated-3: 0 4px 8px rgba(0, 0, 0, 0.40), 0 8px 16px rgba(0, 0, 0, 0.36);
+    --effect-style-elevated-4: 0 8px 16px rgba(0, 0, 0, 0.45), 0 16px 32px rgba(0, 0, 0, 0.40);
+    --effect-style-elevated-5: 0 12px 24px rgba(0, 0, 0, 0.50), 0 24px 48px rgba(0, 0, 0, 0.45);
+    --effect-style-card: 0 2px 6px rgba(0, 0, 0, 0.40), 0 8px 24px rgba(0, 0, 0, 0.32);
+
+    /* Inverted (Schatten nach oben — y-Offset negiert) */
+    --effect-style-inverted-elevated-1: 0 -1px 2px rgba(0, 0, 0, 0.40), 0 -1px 3px rgba(0, 0, 0, 0.30);
+    --effect-style-inverted-elevated-2: 0 -2px 4px rgba(0, 0, 0, 0.40), 0 -4px 8px rgba(0, 0, 0, 0.32);
+    --effect-style-inverted-elevated-3: 0 -4px 8px rgba(0, 0, 0, 0.40), 0 -8px 16px rgba(0, 0, 0, 0.36);
+    --effect-style-inverted-elevated-4: 0 -8px 16px rgba(0, 0, 0, 0.45), 0 -16px 32px rgba(0, 0, 0, 0.40);
+    --effect-style-inverted-elevated-5: 0 -12px 24px rgba(0, 0, 0, 0.50), 0 -24px 48px rgba(0, 0, 0, 0.45);
 
   /* --- Brand --- */
   --primary: hsl(241, 100%, 69%);

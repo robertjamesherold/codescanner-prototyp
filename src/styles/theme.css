@@ -218,6 +218,17 @@
   --leading-xl: 27px;
   --leading-2xl: 36px;
 
+  --shadow-sm: var(--effect-style-elevated-1);
+  --shadow-md: var(--effect-style-elevated-2);
+  --shadow-lg: var(--effect-style-elevated-3);
+  --shadow-xl: var(--effect-style-elevated-4);
+  --shadow-2xl: var(--effect-style-elevated-5);
+  --shadow-card: var(--effect-style-card);
+  --shadow-inverted-sm: var(--effect-style-inverted-elevated-1);
+  --shadow-inverted-md: var(--effect-style-inverted-elevated-2);
+  --shadow-inverted-lg: var(--effect-style-inverted-elevated-3);
+  --shadow-inverted-xl: var(--effect-style-inverted-elevated-4);
+  --shadow-inverted-2xl: var(--effect-style-inverted-elevated-5);
 
 
   /* --- Effects --- */

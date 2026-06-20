@@ -9,14 +9,15 @@ import hooks from "@/hooks";
  * Wird über den Route-Switch (index.tsx) auf Projekt-Routen angezeigt.
  */
 const SidebarProjekt = () => {
-  const { isOpen: isSideBarOpen, toggleSidebar } = hooks.useSideBarOpen();
+  const { isOpen: isSideBarOpen, toggleSidebar, ...rest } = hooks.useSideBarOpen();
 
   return (
     <aside
       data-layer="SidebarProjekt"
-      className={`relative h-screen flex flex-col bg-bg-2 border-r border-border-1 shadow-[0px_1px_2px_rgba(0,0,0,0.15)] transition-all duration-300 ${
+      className={`relative h-screen z-2000 flex flex-col bg-bg-2 border-r border-border-1 transition-all duration-300 ${
         isSideBarOpen ? "w-80" : "w-20"
       }`}
+      {...rest}
     >
       {/* Logo */}
       <div className={`flex h-20 transition-all duration-300 items-center ${isSideBarOpen ? "px-8" : "px-4 justify-center"}`}>
