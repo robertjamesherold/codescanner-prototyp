@@ -76,21 +76,24 @@
       #min-size-gate strong { display: block; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
       #min-size-gate p { font-size: 15px; line-height: 1.55; opacity: 0.75; margin: 0; }
 
-      /* Feste Design-Bühne 1440 × 1000. Bei kleinerem Viewport wird die ganze
-         App uniform heruntergerechnet (statt responsiv umzubrechen). Bei
-         ≥ 1440 × 1000 bleibt das normale, fluide Verhalten (Klasse fehlt dann).
-         Diese Regeln sind bewusst unlayered → sie schlagen die Tailwind-Utilities
-         w-screen / h-screen ohne !important. --app-scale kommt aus dem Script. */
+      /* Down-Scaling auf Design-Basis 1440 × 1000, ohne Balken:
+         Faktor = min(vw/1440, vh/1000). Die knappere Achse trifft damit exakt
+         die Design-Größe, die andere Achse bleibt fluid (Bühne = Viewport ÷
+         Faktor) und füllt das Fenster komplett. Bei ≥ 1440 × 1000 fehlt die
+         Klasse → normales fluides Verhalten. Bewusst unlayered → schlägt die
+         Tailwind-Utilities w-screen / h-screen ohne !important.
+         --app-scale / --stage-w / --stage-h kommen aus dem Script. */
       html.app-scaled,
       html.app-scaled body { overflow: hidden; }
       html.app-scaled #root {
         position: fixed;
-        top: 50%; left: 50%;
-        width: 1440px; height: 1000px;
-        transform: translate(-50%, -50%) scale(var(--app-scale, 1));
-        transform-origin: center center;
+        top: 0; left: 0;
+        width: var(--stage-w, 1440px);
+        height: var(--stage-h, 1000px);
+        transform: scale(var(--app-scale, 1));
+        transform-origin: top left;
       }
-      /* App-Rahmen füllt die feste Bühne statt des echten Viewports. */
+      /* App-Rahmen füllt die Bühne statt des echten Viewports. */
       html.app-scaled .w-screen { width: 100%; }
       html.app-scaled .h-screen { height: 100%; }
     </style>
@@ -157,13 +160,19 @@
         var BASE_W = 1440, BASE_H = 1000;
         var el = document.documentElement;
         function apply() {
-          var scale = Math.min(window.innerWidth / BASE_W, window.innerHeight / BASE_H);
+          var vw = window.innerWidth, vh = window.innerHeight;
+          var scale = Math.min(vw / BASE_W, vh / BASE_H);
           if (scale < 1) {
+            // Bühne = Viewport ÷ Faktor → skaliert füllt sie exakt das Fenster.
             el.style.setProperty('--app-scale', String(scale));
+            el.style.setProperty('--stage-w', vw / scale + 'px');
+            el.style.setProperty('--stage-h', vh / scale + 'px');
             el.classList.add('app-scaled');
           } else {
             el.classList.remove('app-scaled');
             el.style.removeProperty('--app-scale');
+            el.style.removeProperty('--stage-w');
+            el.style.removeProperty('--stage-h');
           }
         }
         var t;
